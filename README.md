@@ -1,7 +1,6 @@
 Estadística computacional
 ================
 Teresa Ortiz <br /> <teresa.ortiz.mancera@gmail.com>
-2017
 
 **Sitio del curso:** <http://www.teresa-ortiz.com/est-computacional>
 
@@ -48,6 +47,12 @@ Teresa Ortiz <br /> <teresa.ortiz.mancera@gmail.com>
     -   Muestreador de Gibbs.
     -   Diagnósticos de convergencia.
 
-://r4ds.had.co.nz/R for Data Science ://adv-r.had.co.nz/Advanced R R for Data Science, Hadley Wickham, Garret Grolemund, O'Reilly. The Art o R Programming, Norman Matloff, No Starch Press. Advanced R, Hadley Wickham, CRC Press. Simulation, Sheldon M. Ross, AP. All of Statistics, A Concise Course in Statistical Inference, Larry Wasserman, Springer. An Introduction to the Bootstrap, Bradley Efron, Robert J. Tibshirani, Chapman & Hall. Data Analysis Using Regression and Multilevel/Hierarchical Models, Andrew Gelman, Jennifer Hill. Doing Bayesian Data Analysis, Second Edition, John K. Kruschke, AP. Bayesian Data Analysis, Andrew Gelman, John B. Carlin, Hal S. Stern and David B. Dunson.
+### Referencias
 
-Tareas 20%, exámen parcial (proyecto y exámen en clase) 40%, exámen final 40%. \\
+[R for Data Science](http://r4ds.had.co.nz), Hadley Wickham, Garret Grolemund, O'Reilly.
+[Advanced R](http://adv-r.had.co.nz/), Hadley Wickham, CRC Press.
+Simulation, Sheldon M. Ross, AP. A First Course in Probability, Sheldon M. Ross, Pearson. All of Statistics, A Concise Course in Statistical Inference, Larry Wasserman, Springer. An Introduction to the Bootstrap, Bradley Efron, Robert J. Tibshirani, Chapman & Hall. Data Analysis Using Regression and Multilevel/Hierarchical Models, Andrew Gelman, Jennifer Hill. [Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), Second Edition, John K. Kruschke, AP. Bayesian Data Analysis, Andrew Gelman, John B. Carlin, Hal S. Stern and David B. Dunson.
+
+### Calificación
+
+Tareas 20% (se envían por correo con título: EstComp-TareaX), exámen parcial (proyecto y exámen en clase) 40%, Exámen final 40%.
