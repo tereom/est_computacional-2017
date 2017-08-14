@@ -5,6 +5,8 @@ Estadística computacional
 
 **Sitio del curso:** <http://www.teresa-ortiz.com/est-computacional>
 
+**Github:** [/tereom/est\_computacional](https://github.com/tereom/est_computacional)
+
 ### 1. Manipulación y visualización de datos
 
 -   Introducción a R.

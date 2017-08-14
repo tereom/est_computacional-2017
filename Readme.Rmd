@@ -7,6 +7,8 @@ output: github_document
 
 **Sitio del curso:** [http://www.teresa-ortiz.com/est-computacional](http://www.teresa-ortiz.com/est-computacional)
 
+**Github:** [/tereom/est_computacional](https://github.com/tereom/est_computacional)
+
 ### 1. Manipulación y visualización de datos
 * Introducción a R.  
 * Visualización de datos.  
