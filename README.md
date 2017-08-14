@@ -1,6 +1,7 @@
 Estadística computacional
 ================
-Teresa Ortiz <br /> <teresa.ortiz.mancera@gmail.com>
+
+**Teresa Ortiz:** <teresa.ortiz.mancera@gmail.com>
 
 **Sitio del curso:** <http://www.teresa-ortiz.com/est-computacional>
 
@@ -30,9 +31,14 @@ Teresa Ortiz <br /> <teresa.ortiz.mancera@gmail.com>
     -   El generador uniforme de números aleatorios.
     -   El método de la transformación inversa.
     -   Simulación de variables aleatorias discretas con soporte finito.
-        -   Otras variables aleatorias.
--   Simulación para modelos gráficos + Modelos probabilíticos gráficos. + Simulación (e.g. ANOVA, regresión simple).
--   Inferencia paramétrica y remuestreo + Modelos paramétricos. + Bootsrap paramétrico.
+    -   Otras variables aleatorias.
+-   Simulación para modelos gráficos
+    -   Modelos probabilíticos gráficos.
+    -   Simulación (e.g. ANOVA, regresión simple).
+-   Inferencia paramétrica y remuestreo
+    -   Modelos paramétricos.
+    -   Bootsrap paramétrico.
+-   Inferencia de gráficas
 
 ### 4. Métodos computacionales e inferencia Bayesiana
 
@@ -51,8 +57,14 @@ Teresa Ortiz <br /> <teresa.ortiz.mancera@gmail.com>
 
 [R for Data Science](http://r4ds.had.co.nz), Hadley Wickham, Garret Grolemund, O'Reilly.
 [Advanced R](http://adv-r.had.co.nz/), Hadley Wickham, CRC Press.
-Simulation, Sheldon M. Ross, AP. A First Course in Probability, Sheldon M. Ross, Pearson. All of Statistics, A Concise Course in Statistical Inference, Larry Wasserman, Springer. An Introduction to the Bootstrap, Bradley Efron, Robert J. Tibshirani, Chapman & Hall. Data Analysis Using Regression and Multilevel/Hierarchical Models, Andrew Gelman, Jennifer Hill. [Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), Second Edition, John K. Kruschke, AP. Bayesian Data Analysis, Andrew Gelman, John B. Carlin, Hal S. Stern and David B. Dunson.
+Simulation, Sheldon M. Ross, AP.
+A First Course in Probability, Sheldon M. Ross, Pearson.
+All of Statistics, A Concise Course in Statistical Inference, Larry Wasserman, Springer.
+An Introduction to the Bootstrap, Bradley Efron, Robert J. Tibshirani, Chapman & Hall.
+[Data Analysis Using Regression and Multilevel/Hierarchical Models](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman, Jennifer Hill.
+[Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), Second Edition, John K. Kruschke, AP.
+[Bayesian Data Analysis](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman, John B. Carlin, Hal S. Stern and David B. Dunson.
 
 ### Calificación
 
-Tareas 20% (se envían por correo con título: EstComp-TareaX), exámen parcial (proyecto y exámen en clase) 40%, Exámen final 40%.
+Tareas 20% (se envían por correo con título: EstComp-TareaXX), exámen parcial (proyecto y exámen en clase) 40%, Exámen final 40%.
