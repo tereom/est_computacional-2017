@@ -1,0 +1,275 @@
+---
+title: "Estadística Computacional"
+author: "Teresa Ortiz"
+date: "8/4/2017"
+output:
+  html_document:
+    css: ../codigo-estilos/cajas.css
+    theme: spacelab
+---
+
+</br>
+
+Revisaremos el temario, el flujo de trabajo para las clases, la entrega de 
+tareas y la calificación final.
+
+
+**Sitio del curso:** http://www.teresa-ortiz.com/est-computacional   
+**Correo:** teresa.ortiz.mancera@gmail.com  
+**Github:** [/tereom/est_computacional](https://github.com/tereom/est_computacional)
+
+***
+### Temario
+
+### 1. Manipulación y visualización de datos
+* Introducción a R.  
+* Visualización de datos.  
+* Manipulación y limpieza de datos.  
+* Temas selectos de programación en R.  
+
+### 2. Inferencia y remuestreo
+* Repaso de probabilidad.	
+* Muestreo y probabilidad.
+* Inferencia.
+* El principio del _plug-in_.
+* Bootstrap
+    + Cálculo de errores estándar e intervalos de confianza.
+    + Estructuras de datos complejos.
+* Introducción a modelos probabilísticos.
+
+### 3. Modelos de probabilidad y simulación
+* Variables aleatorias y modelos probabilísticos.
+* Familias importantes: discretas y continuas.
+* Teoría básica de simulación
+    + El generador uniforme de números aleatorios.
+    + El método de la transformación inversa.
+    + Simulación de variables aleatorias discretas con soporte finito.
+	+ Otras variables aleatorias.
+* Simulación para modelos gráficos
+	+ Modelos probabilíticos gráficos.
+	+ Simulación (e.g. ANOVA, regresión simple).
+* Inferencia paramétrica y remuestreo
+	+ Modelos paramétricos.
+	+ Bootsrap paramétrico.
+* Inferencia de gráficas
+
+### 4. Métodos computacionales e inferencia Bayesiana	
+* Inferencia bayesiana.
+* Métodos diretos 
+    + Familias conjugadas. 
+	  + Aproximación por cuadrícula.
+	  + Aceptación y rechazo.
+* MCMC
+    + Cadenas de Markov.
+	  + Metropolis-Hastings.
+	  + Muestreador de Gibbs.
+	  + Diagnósticos de convergencia.
+#### Referencias
+
+[R for Data Science](http://r4ds.had.co.nz), Hadley Wickham, Garret Grolemund, O'Reilly.  
+[Advanced R](http://adv-r.had.co.nz/), Hadley Wickham, CRC Press.  
+Simulation, Sheldon M. Ross, AP.  
+A First Course in Probability, Sheldon M. Ross, Pearson.  
+All of Statistics, A Concise Course in Statistical Inference,  Larry Wasserman, Springer.  
+An Introduction to the Bootstrap,  Bradley Efron, Robert J. Tibshirani, Chapman \& Hall.  
+Data Analysis Using Regression and Multilevel/Hierarchical Models, Andrew Gelman, Jennifer Hill.  
+[Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), Second Edition, John K. Kruschke, AP.  
+Bayesian Data Analysis, Andrew Gelman, John B. Carlin, Hal S. Stern and David B. Dunson.
+
+#### Calificación
+Tareas 20\% (se envían por correo con título: EstComp-TareaXX), exámen parcial 
+(proyecto y exámen en clase) 40\%, Exámen final 40\%.
+
+****
+
+### Encuesta
+
+<div class="clicker">
+**[SOCRATIVE:](https://b.socrative.com/login/student/)** ESTCOMP
+
+**1. Estudio **
+
+  a. Maestría en ciencia de datos
+  b. Maestría en computación
+  c. Licenciatura en matemáticas
+  d. Otra maestría
+  e. Otra licenciatura
+
+**2. Experiencia en R:**
+
+  a. 0-5 horas
+  b. 5-10 horas
+  c. 10-20 horas
+  d. más de 20 horas
+
+**3. Conocimientos de estadística**
+
+  a. nunca he tomado un curso
+  b. tomé 1 o 2 cursos
+  c. he tomado 3 o más cursos
+  
+
+</div>
+
+```{r cargar_paquetes, echo=FALSE, message=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE
+)
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+```
+
+***
+### 1. Manipulación y visualización de datos
+
+El estándar científico para contestar preguntas o tomar decisiones es uno que
+se basa en el análisis de datos. Aquí nos interesan las técnicas cuantitativas: 
+cómo recolectar, organizar, entender, interpretar y extraer información de 
+colecciones de datos predominantemente numéricos. Todas estas tareas son partes 
+del análisis de datos, cuyo proceso podría resumirse con el siguiente diagrama:
+
+![](imagenes/analisis.png)
+
+Las herramuentas que utilizamos a lo largo del proceso de análisis son 
+importantes, es por ello que dedicaremos las primeras sesiones a aprender 
+herramientas que aplicaremos a lo largo del curso. Utilizaremos R y nos 
+enfocaremos en los paquetes que forman parte del [tidyverse](http://tidyverse.org/).
+
+
+### 2. Inferencia y Remuestreo
+
+> Bootstrap: _to pull oneself up by one's bootstrap_
+
+Como explican Efron y Tibshirani en *An Introduction to the bootstrap*, las 
+expicaciones del *bootstrap* y otros métodos computacionales, involucran
+las ideas de inferencia estadistica tradicional. Las ideas báscias no han cambiado
+pero la implementación de estas sí.
+
+Los tres conceptos básicos de estadística son recolección de datos, resúmenes (o descriptivos) de
+datos e inferencia. Veamos un ejemplo de consumo de aspirina y ataques cardiacos
+cuyos resultados fueron publicados en el [New York Times](http://www.nytimes.com/1988/01/27/us/heart-attack-risk-found-to-be-cut-by-taking-aspirin.html). Se diseñó un estudio para investigar si el consumo de dosis bajas de aspirina
+podían prevenir los ataques cardiacos en hombres sanos en edad media. Para ello
+se hizo un diseño controlado, aleatorizado y doblemente ciego. La mitad de los 
+participantes recibieron aspirina y la otra mitad un placebo. Las estadísticas 
+descriptivas del artículo son muy sencillas:
+
+grupo    | ataques cardiacos | sujetos 
+---------|-------------------|---------
+aspirina |    104            | 11037
+placebo  |    189            | 11034
+
+Entonces la estimación del cociente de las tasas es 
+$$\hat{\theta}=\frac{104/11037}{189/11034} = 0.55$$
+En la muestra los individuos que toman aspirina tienen únicamente 55\% de los 
+ataques que los que toman placebo. Sin embargo, lo que realmente nos interesa 
+es $\theta$: el cociente de tasas que observaríamos si pudieramos tratar a 
+todos los hombres y no únicamente a una muestra.
+
+Aquí es donde recurrimos a inferencia estadística: 
+
+$$0.43 < \theta < 0.70$$
+El verdadero valor de $\theta$ esta en el intervalo $(0.43,0.70)$ con una confianza del 
+95%.
+
+Ahora, el bootstrap es un método de simulación basado en datos para inferencia 
+estadística. Si una muestra es una aproximación de la población que la generó, 
+entoces podemos hacer muestreos de la muestra para calcular una estadística de 
+interés y medir la exactitud en la misma.
+
+En este caso tenemos los resultados del experimento en la variable *trial*.
+
+```{r datos_bootstrap}
+trial <- data_frame(patient = 1:22071, 
+  group = ifelse(patient <= 11037, "aspirin", "control"), 
+  heart_attack = c(rep(TRUE, 104), rep(FALSE, 10933), rep(TRUE, 189), rep(FALSE, 10845)))
+trial
+```
+
+Y calculamos el cociente de las tasas:
+
+```{r bootstrap_summary}
+summ_stats <- trial %>% 
+  group_by(group) %>%
+  summarise(
+    n_attacks = sum(heart_attack), 
+    n_subjects = n(),
+    rate_attacks = n_attacks / n_subjects * 100
+  )
+summ_stats
+
+ratio_rates <- summ_stats$rate_attacks[1] / summ_stats$rate_attacks[2]
+```
+
+Después calculamos 1000 replicaciones *bootstrap* de $\hat{\theta*}$
+
+```{r replicaciones_bootstrap}
+compute_rr <- function(){
+  boot_sample <- trial %>%
+    group_by(group) %>%
+    sample_frac(replace = TRUE)
+  rates <- boot_sample %>% 
+      summarise(rate_attacks = sum(heart_attack) / n()) %>%
+      pull(rate_attacks)
+  rates[1] / rates[2]
+} 
+
+boot_ratio_rates <- rerun(500, compute_rr()) %>% 
+  map_dbl(~.x)
+```
+
+Las replicaciones se pueden utilizar para hacer inferencia de los datos. Por 
+ejemplo, podemos estimar el error estándar de $\theta$:
+
+```{r inferencias_bootstrap, fig.align='center', fig.width=4, fig.height=4}
+se <- sd(boot_ratio_rates)
+comma(se)
+```
+
+Para este ejemplo es fácil calcular el error estándar de la estimacón usando 
+fórmulas, más adelante veremos ejemplos más interesantes.
+
+
+### 3. Modelos de probabilidad y simulación
+
+La siguiente serie cuenta el número de temblores de magnitud 7 o más en el mundo, 
+desde 1900 a 2006 (Hidden Markov Models for Time Series, de Zucchini y MacDonald).
+
+Es natural intentar modelar estos conteos con una distribución Poisson, ajustamos
+el modelo y simulamos del mismo. La siguiente figura de paneles contiene 19 simulaciones 
+del modelo y los datos originales, ¿puedes detectar los datos?, ¿en que son 
+diferentes?
+
+```{r, out.width = "600px"}
+knitr::include_graphics("imagenes/terremotos.png")
+```
+
+Simular conjuntos de datos *falsos* puede servir para validar procedimientos 
+estadísticos y para verificar las propiedades de los procesos de estimación.
+
+### 4. Métodos computacionales e inferencia Bayesiana	
+Imaginemos que nos presentan una moneda y consideramos:
+
+1. La moneda es justa.
+
+2. La moneda sale sol 20% de las veces.
+
+3. La moneda sale sol 80% de las veces.
+
+Pensemos que antes de ver lanzamientos pensamos que cualquiera de estos 3 escenarios es 
+igualmente probable, sin embargo, si vemos 10 lanzamientos y solo 2 soles
+hace sentido que creamos más fehacientemente en el escenario 2. Veremos 
+exactamente cuánto más creemos en un escenario una vez que observamos datos.
+
+Antes de ver los lanzamientos teníamos ciertas creencias o *creencias a priori*
+que actualizamos tras ver los lanzamientos para tener *creencias posteriores*.
+
+El objetivo de la inferencia bayesiana es llevarnos de creencias a priori a 
+creencias posteriores, donde nuestras creencias están descritas por distribuciones
+de probabilidad. Una manera de hacerlo es muestrear una gran cantidad de puntos
+de la posterior y después, a partir de esos puntos, calcular estadísticas 
+descriptivas de la distribución.
+
+```{r, out.width = "300px"}
+knitr::include_graphics("imagenes/mcmc.png")
+```
