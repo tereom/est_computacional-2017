@@ -87,7 +87,7 @@ de paquetes en R.
 Organizar los análisis para ser reproducibles no es trivial pero es una buena 
 práctica que te agradecerán los que consulten o utilicen tu trabajo (incluído tu yo del 
 futuro), puedes leer más recomendaciones para lograr análisis reproducibles en 
-[initial steps toward reproducible research](http://kbroman.org/steps2rr/).
+[initial steps toward reproducible research](http://kbroman.org/steps2rr/). También es conveniente usar un controlador de versiones este es un buen [tutorial](http://happygitwithr.com/) para Git y Github con R.
 
 <!--
 http://www.nature.com/nature/journal/v483/n7391/full/483531a.html
