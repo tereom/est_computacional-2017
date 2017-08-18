@@ -89,13 +89,6 @@ práctica que te agradecerán los que consulten o utilicen tu trabajo (incluído
 futuro), puedes leer más recomendaciones para lograr análisis reproducibles en 
 [initial steps toward reproducible research](http://kbroman.org/steps2rr/). También es conveniente usar un controlador de versiones este es un buen [tutorial](http://happygitwithr.com/) para Git y Github con R.
 
-<!--
-http://www.nature.com/nature/journal/v483/n7391/full/483531a.html
-http://retractionwatch.com
-http://www.the-scientist.com/?articles.view/articleNo/33695/title/Top-Science-Scandals-of-2012/
-http://www.the-scientist.com/?articles.view/articleNo/33719/title/Science-s-Reproducibility-Problem/
--->
-
 ### Descargar R y RStudio
 Para comenzar se debe descargar [R](https://cran.r-project.org), esta descarga 
 incluye R básico y un editor de textos para escribir código. Después de
@@ -425,7 +418,7 @@ Utilizaremos el paquete ggplot2 y cubriremos los siguientes puntos:
 * Distintos tipos de gráficas  
 
 #### Gráficas de dispersión
-<!-- Let’s use our first graph to answer a question: Do cars with big engines use more fuel than cars with small engines? You probably already have an answer, but try to make your answer precise. What does the relationship between engine size and fuel efficiency look like? Is it positive? Negative? Linear? Nonlinear? -->
+
 ```{r}
 # install.packages("ggplot2") # sólo se hace una vez
 library(tidyverse) # Cargamos el paquete en nuestra sesión
@@ -438,11 +431,13 @@ Usaremos el conjunto de datos *mpg* que se incluye en R, puedes encontrar inform
 glimpse(mpg)
 ```
 
+Y comencemos con nuestra primera gráfica:
 
 ```{r, fig.width = 5, fig.height = 4}
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy))
 ```
+
 En ggplot2 se inicia una gráfica con la instrucción `ggplot()`, debemos especificar 
 explicitamente que base de datos usamos, este es el primer argumento en la 
 función ggplot. Una vez que creamos la base añadimos 
@@ -457,17 +452,12 @@ estéticas de la gráfica. En el ejemplo de arriba mapeamos `displ` al eje x,
 la forma, color y/o tamaño del punto. Esta flexibilidad nos permite entender o 
 descubrir patrones más interesantes en los datos.
 
-<!-- In the plot below, one group of points (highlighted in red) seems to fall outside of the linear trend. These cars have a higher mileage than you might expect. How can you explain these cars? 
-Let’s hypothesize that the cars are hybrids. One way to test this hypothesis is to look at the class value for each car. The class variable of the mpg dataset classifies cars into groups such as compact, midsize, and SUV. If the outlying points are hybrids, they should be classified as compact cars or, perhaps, subcompact cars (keep in mind that this data was collected before hybrid trucks and SUVs became popular).
-
-You can add a third variable, like class, to a two dimensional scatterplot by mapping it to an aesthetic. An aesthetic is a visual property of the objects in your plot. Aesthetics include things like the size, the shape, or the color of your points. You can display a point (like the one below) in different ways by changing the values of its aesthetic properties. Since we already use the word “value” to describe data, let’s use the word “level” to describe aesthetic properties. Here we change the levels of a point’s size, shape, and color to make the point small, triangular, or blue:-->
-
 ```{r, fig.width = 5.5, fig.height = 4}
 ggplot(mpg) + 
   geom_point(aes(x = displ, y = hwy, color = class))
 ```
 
-![](imagenes/manicule2.jpg) Experimenta con los _aesthetics_ color (color), 
+![](../imagenes/manicule2.jpg) Experimenta con los _aesthetics_ color (color), 
 tamaño (size) y forma (shape).
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  ¿Qué diferencia hay entre las variables categóricas y las continuas?
@@ -500,7 +490,7 @@ p + geom_point()
 p + geom_jitter() 
 ```
 
-![](imagenes/manicule2.jpg) ¿Cómo podemos mejorar la siguiente gráfica?
+![](../imagenes/manicule2.jpg) ¿Cómo podemos mejorar la siguiente gráfica?
 ```{r, fig.width = 5, fig.height = 4}
 ggplot(mpg, aes(x = class, y = hwy)) + 
   geom_point() 
@@ -527,7 +517,7 @@ ggplot(mpg, aes(x = reorder(class, hwy), y = hwy)) +
     geom_boxplot()
 ```
 
-![](imagenes/manicule2.jpg) Lee la ayuda de _reorder_ y repite las gráficas 
+![](../imagenes/manicule2.jpg) Lee la ayuda de _reorder_ y repite las gráficas 
 anteriores ordenando por la mediana de _hwy_.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ¿Cómo harías
@@ -587,7 +577,7 @@ ggplot(airquality, aes(x = Solar.R, y = Ozone)) +
   geom_smooth(span = 3)
 ```
 
-![](imagenes/manicule2.jpg) Escribe algunas preguntas que puedan contestar con estos datos.
+![](../imagenes/manicule2.jpg) Escribe algunas preguntas que puedan contestar con estos datos.
 
 En ocasiones es necesario realizar transformaciones u obtener subconjuntos de los 
 datos para poder responder preguntas de nuestro interés.
@@ -613,7 +603,7 @@ La preparación de los datos es un aspecto muy importante del análisis y suele 
 la fase que lleva más tiempo. Es por ello que el siguiente tema se enfocará en 
 herramientas para hacer transformaciones de manera eficiente.
 
-![](imagenes/manicule.jpg) Tarea. Explora la base de datos gapminder, estos datos están 
+![](../imagenes/manicule.jpg) Tarea. Explora la base de datos gapminder, estos datos están 
 incluidos en el paquete del mismo nombre, para acceder a ellos basta con cargar el paquete:
 
 ```{r}
@@ -632,66 +622,3 @@ página de [ggplot2](http://ggplot2.tidyverse.org).
 * Otro recurso muy útil es el [acordeón de ggplot](https://www.rstudio.com/wp-content/uploads/2015/04/ggplot2-spanish.pdf).
 
 
-
-<!--
-####_Big Data_
-En esta clase usaremos R para trabajar con datos *chicos* (que caben en memoria), 
-si necesitas trabajar con datos más grandes (por ejemplo, 10-100 Gb)
-el paquete [data.table](https://github.com/Rdatatable/data.table) puede resultar
-útil. También es común poder resolver problemas con muestras o subconjuntos de
-los datos que si quepan en memoria y por tanto usar las herramientas que estudiaremos. 
-Otro escenario es cuando el problema de datos grandes se puede dividir en muchos 
-problemas chicos y se puede usar un sistema como Hadoop o Spark para enviar 
-subconjuntos de los datos a distintas computadoras donde cada una resuelve un 
-problema de datos *chicos*.
--->
-
-<!--
-Veamos uno de los primeros ejemplos que se utilizaron para ilustrar el bootstrap.
-Los datos son calificaciones en examen de admisión a la escuela de leyes (LSAT) 
-y el de promedio (GPA) de 15 alumnos.
-
-```{r datos}
-set.seed(187873)
-law_school <- read_csv("data/law_school.csv") %>% select(-X4)
-law_school_sample <- sample_n(law_school, size = 15)
-data <- data_frame(
-  LSAT = c(576, 635, 558, 578, 666, 580, 555, 661, 651, 605, 653, 575, 545, 572, 594), 
-  GPA = c(3.39, 3.30, 2.81, 3.03, 3.44, 3.07, 3.00, 3.43, 3.36, 3.13, 3.12, 2.74, 
-    2.76, 2.88, 2.96))
-
-ggplot(law_school_sample, aes(x = LSAT, y = GPA)) + geom_point()
-```
-La escuela de derecho está interesada en conocer la correlación entre las dos
-variables.
-
-$$\theta= \frac{E\{(y - \mu_y)(z - \mu_z\})}{\sigma_y \sigma_z}$$
-Entonces, el estimador *plug-in* es la correlación muestral
-
-$$\hat{\theta}= \frac{\sum_i\{(Y_i - \bar{Y})(Z_i - \bar{Z})}{\sqrt{\sum_i\{(Y_i - \bar{Y})^2\sum_i(Z_i - \bar{Z})^2}}$$
-
-```{r corr_plugin}
-cor(law_school_sample$LSAT, law_school_sample$GPA)
-```
-
-Tomamos 1,000 muestras (con repetición) de los datos, cada una del mismo tamaño 
-de los datos y en cada muestra calculamos la correlación entre LSAT y GA.
-
-```{}
-cor_boot_samples <- function(){
-  law_school_boot <- sample_n(law_school_sample, size = 15, replace = TRUE)
-  cor_boot <- cor(law_school_boot$LSAT, law_school_boot$GPA)
-  return(cor_boot)
-}
-cor_boot <- rerun(1000, cor_boot_samples()) %>% 
-  map_dbl(~.x)
-
-qplot(cor_boot, geom = "histogram", bins = 20)
-```
-
-```{r, eval =FALSE}
-se <- sd(cor_boot)
-comma(se)
-```
-
--->
