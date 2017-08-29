@@ -1,0 +1,21 @@
+ 
+Tarea 3
+-------
+
+Fecha de entrega: lunes 4 de septiembre.
+
+Objetivo: el propósito de esta tarea es que trabajen un análisis más completo usando las herramienta que hemos estudiado, en particular visualización, transformaciones y el paradigma separa-aplica-combina. 
+
+Datos: Para esta tarea pueden elegir la base de datos con la que desean trabajar, puede ser alguna de clase: billboard, flights, batting, etc. ó la base de datos de causas de mortalidad en México (tarea anterior) ó cualquier base de datos de su interés.
+
+Una vez que elijan los datos preguntense:
+¿Qué otras fuentes de información podrían ser útiles?
+¿Qué quiero aprender de estos datos?
+¿Qué datos hay disponibles?
+¿Me puedo enfocar en un subconjunto de los datos?
+
+Una vez que consideren los puntos anteriores pueden plantearse las preguntas que quieren responder con sus datos (tendencias en causas de mortalidad, diferencias por grupos, etc), conforme trabajen con sus datos surgirán nuevas preguntas.
+
+Entrega: Realicen un reporte que incluya una introducción donde se explique las preguntas que abordaron, descripción de las bases de datos, gráficas (al menos 3) y tablas si es necesario.
+
+Visiten el blog de Diego Valle (http://www.diegovalle.net), lo recomiendo porque usa análisis descriptivos sencillos y resúmenes simples para explorar datos de manera interesante, además todo su código esta abierto en un repositorio de github así que si quieren pueden aprender como hizo cada cosa.
