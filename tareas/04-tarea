@@ -1,0 +1,11 @@
+Contesta las siguientes preguntas (si lo deseas puedes usar simulación para responder):
+
+1. Una baraja regular de 52 cartas se divide de manera aleatoria en 4 pilas de 13 cartas cada una. Calcula la probabilidad
+de que cada pila tenga exactamente un as. 
+
+2. Se ruedan dos dados justos. ¿Cuál es la porbabilidad condicional de que el segundo resulte en 6 dado que los dados 
+cayeron en números distintos?
+
+3. Revolvemos una baraja de cartas y la partimos en dos mitades (26 cartas en cada parte). Extraemos una carta de la primera mitad y resulta en As. Colocamos el As en la segunda mitad de la baraja, revolvemos las 27 cartas correspondientes y seleccionamos una carta. ¿Cuál es la probabilidad de que hayamos seleccionado un As? Pista: condiciona en si seleccionamos o no la carta que añadimos.
+
+4. Resuelve de manera analítica el problema de las catafixias de Chabelo.
