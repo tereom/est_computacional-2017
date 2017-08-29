@@ -57,15 +57,15 @@ Estadística computacional
 
 ### Referencias
 
-[R for Data Science](http://r4ds.had.co.nz), Hadley Wickham, Garret Grolemund, O'Reilly.  
-[Advanced R](http://adv-r.had.co.nz/), Hadley Wickham, CRC Press.  
-Simulation, Sheldon M. Ross, AP.  
-A First Course in Probability, Sheldon M. Ross, Pearson.  
-All of Statistics, A Concise Course in Statistical Inference, Larry Wasserman, Springer.  
-An Introduction to the Bootstrap, Bradley Efron, Robert J. Tibshirani, Chapman & Hall.  
-[Data Analysis Using Regression and Multilevel/Hierarchical Models](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman, Jennifer Hill.  
-[Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), Second Edition, John K. Kruschke, AP.  
-[Bayesian Data Analysis](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman, John B. Carlin, Hal S. Stern and David B. Dunson.  
+[R for Data Science](http://r4ds.had.co.nz), Hadley Wickham, Garret Grolemund, O'Reilly.
+[Advanced R](http://adv-r.had.co.nz/), Hadley Wickham, CRC Press.
+Simulation, Sheldon M. Ross, AP.
+A First Course in Probability, Sheldon M. Ross, Pearson.
+All of Statistics, A Concise Course in Statistical Inference, Larry Wasserman, Springer.
+An Introduction to the Bootstrap, Bradley Efron, Robert J. Tibshirani, Chapman & Hall.
+[Data Analysis Using Regression and Multilevel/Hierarchical Models](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman, Jennifer Hill.
+[Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), Second Edition, John K. Kruschke, AP.
+[Bayesian Data Analysis](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman, John B. Carlin, Hal S. Stern and David B. Dunson.
 
 ### Calificación
 

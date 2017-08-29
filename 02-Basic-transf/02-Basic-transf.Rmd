@@ -267,7 +267,7 @@ información esta por grupo demográfico de acuerdo a sexo (m, f), y edad (0-4,
 
 
 ```{r}
-tb <- read_csv("data/tb.csv")
+tb <- read.csv("data/tb.csv")
 tb
 ```
 ![](../imagenes/manicule2.jpg) De manera similar a los ejemplos anteriores, 
