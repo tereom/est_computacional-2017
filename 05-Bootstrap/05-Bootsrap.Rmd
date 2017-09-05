@@ -571,8 +571,7 @@ $Q_i$ es un número que representa la habilidad del estudiante y $\textbf{v}$ es
 un vector fijo con 5 números que aplica a todos los estudiantes. Si este modelo
 simple fuera cierto, entonces únicamente el $\hat{\lambda}_1$ sería positivo
 y $\textbf{v} = \hat{v}_1$.
-
-Sea $$\hat{\theta}=\frac{\lambda}{\sum_{i=1}^5\hat{\lambda}_i}$$
+Sea $$\hat{\theta}=\sum_{i=1}^5\hat{\lambda}_i$$
 el modelo propuesto es equivalente a $\hat{\theta}=1$, inculso si el modelo es
 correcto, no esperamos que $\hat{\theta}$ sea exactamente uno pues hay ruido en 
 los datos.
@@ -666,7 +665,7 @@ Usamos `system.time()` para comparar tiempos de ejecución, esta función calcul
 el tiempo en segundos que toma ejecutar una expresión (si hay un error, regresa 
 el tiempo hasta que ocurre el error):
 
-```{r alternativa_bootstrap, eval = FALSE}
+```{r alternativa_bootstrap, echo=FALSE, eval = FALSE}
 library(magrittr)
 library(broom)
 
@@ -680,12 +679,12 @@ system.time({
         theta_hat <- eigen_G$values[1] / sum(eigen_G$values)
     }
     B <- 500
-    thetas_boot <- rerun(B, pc_boot()) %>% flatten_dbl()
+    thetas_boot <- rerun(B, pcBoot()) %>% flatten_dbl()
 })
 
 system.time({
     prim_boot <- marks %>% 
-        bootstrap(m = B) %>% 
+        broom::bootstrap(m = B) %>% 
         do(cov = cov(.) * 87 / 88) %$%
         map(cov, ~eigen(.)$values) %>% 
         map_dbl(~.[1]/sum(.))
