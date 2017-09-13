@@ -1,0 +1,66 @@
+---
+title: "Tarea: intervalos de confianza"
+author: "Teresa Ortiz"
+date: "9/12/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+theme_set(theme_minimal())
+```
+
+### 1. ENIGH
+Para este ejercicio usaremos los datos de la [ENIGH](http://www.inegi.org.mx/est/contenidos/proyectos/encuestas/hogares/regulares/enigh/) 
+(2014). En la tabla concentradohogar que vimos en clase se incluyen las variables 
+alimentos, vestido, vivienda, salud, comunica, educacion y esparci 
+(esparcimiento) que indican el gasto trimestral en cada una de las categorías. 
+
+```{r enigh, message=FALSE, warning=FALSE}
+concentrado_hogar <- read_csv("datos/concentradohogar.csv")
+hogar <- concentrado_hogar %>% 
+    select(folioviv, foliohog, est_dis, upm, factor_hog, ing_cor, alimentos, 
+        vestido, vivienda, salud, transporte, comunica, educacion, esparci)
+```
+
+Nos interesa analizar los patrones de gasto por decil de ingreso, para ello 
+sigue los siguientes pasos.
+
+1. Calcula los deciles de ingreso usando la variable de ingreso corriente (ing_cor).
+Debes tomar en cuenta el diseño de la muestra, puedes usar la función
+`survey_quantile()` del paquete `srvyr` o `svyquantile()` del paquete `survey`.
+Reporta las estimaciones y sus errores estándar usando el bootstrap de Rao y Wu.
+
+2. Crea una nueva variable que indique el decil de ingreso para cada hogar. 
+Tips: 1) una función que puede resultar útil es `cut2()` (de `Hmisc`), 
+2) si usas el paquete `srvyr` puedes usar `mutate()` sobre
+el objeto `survey` con pesos de replicaciones bootstrap.
+
+3. Estima para cada decil, el porcentaje del gasto 
+en cada categoría, reporta el error estándar de las estimaciones, usa 
+el bootstrap de Rao y Wu. Tip: 1) agrega una variable que indica para cada hogar el 
+porcentaje de gasto en cada categoría, 2) si usas srvyr puedes usar la función 
+`group_by()` para estimar la media del porcentaje de gasto por decil.
+
+4. Realiza una gráfica con las estimaciones del paso 3.
+
+### 2. Cobertura de intervalos
+Vamos a retomar de simulación que vimos en clase, donde comparamos los intervalos de 
+confianza construidos con el método de percentiles y usando la aproximación 
+normal ($\hat{\theta} \pm 1.96 \hat{se}$). 
+
+Generamos una muestra de tamaño 30 (en clase era 10) de una distribución normal 
+estándar, el parámetro de interés es $e^{\mu}$ donde $\mu$ es la media poblacional.
+
+1. Construye intervalos de confianza con el método de percentiles y de 
+aproximación normal.
+
+2. ¿Cuál tiene mejor cobertura? Realiza 500 simulaciones de vectores de tamaño
+30 de una normal estándar, para cada simulación calcula $\hat{\theta}$ y calcula 
+el porcentaje de realizaciones que caen dentro de cada intervalo de confianza.
+
+```{r}
+set.seed(766587)
+x <- rnorm(30)
+```
