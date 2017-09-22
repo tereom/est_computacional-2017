@@ -46,21 +46,38 @@ porcentaje de gasto en cada categoría, 2) si usas srvyr puedes usar la función
 4. Realiza una gráfica con las estimaciones del paso 3.
 
 ### 2. Cobertura de intervalos
-Vamos a retomar de simulación que vimos en clase, donde comparamos los intervalos de 
-confianza construidos con el método de percentiles y usando la aproximación 
-normal ($\hat{\theta} \pm 1.96 \hat{se}$). 
+Cobertura de intervalos de confianza. En este problema realizarás un ejercicio 
+de simulación para comparar intervalos de confianza. Utiliza la función rnorm
+para simular muestras de tamaño 10 de una distribución 
+normal estándar, el estadístico de interés es $\theta=exp(\mu)$. 
 
-Generamos una muestra de tamaño 30 (en clase era 10) de una distribución normal 
-estándar, el parámetro de interés es $e^{\mu}$ donde $\mu$ es la media poblacional.
+Sigue el siguiente proceso:
 
-1. Construye intervalos de confianza con el método de percentiles y de 
-aproximación normal.
+i) Genera una muestra aleatoria de una distribución normal estándar de tamaño 10.
 
-2. ¿Cuál tiene mejor cobertura? Realiza 500 simulaciones de vectores de tamaño
-30 de una normal estándar, para cada simulación calcula $\hat{\theta}$ y calcula 
-el porcentaje de realizaciones que caen dentro de cada intervalo de confianza.
+ii) Genera 6000 muestras bootstrap y calcula intervalos de confianza del 95\% 
+para $\hat{\theta}$ usando 1) el método normal, 2) percentiles y 3) BC_a.
 
-```{r}
-set.seed(766587)
-x <- rnorm(30)
-```
+iii) Revisa si el intervalo de confianza contiene el verdadero valor del parámetro
+($\theta=1$), en caso de que no lo contenga registra si falló por la izquierda 
+(el límite inferior >1) o falló por la derecha (el límite superior <1).
+
+a) Repite el proceso descrito 500 veces y llena la siguiente tabla:
+
+Método     | \% fallo izquierda   | \% fallo derecha  | cobertura (simulaciones)
+-----------|----------------------|-------------------|------------------------ 
+Normal     |                      |                   |
+Percentiles|                      |                   |
+BC_a       |                      |                   |
+
+La columna cobertura es una estimación de la cobertura del intervalo basada en 
+las simulaciones, para calcularla simplemente escribe el porcentaje de los 
+intervalos que incluyeron el verdadero valor del parámetro. Recuerda usar la 
+semilla.
+
+b) Realiza una gráfica de páneles, en cada panel mostrarás los resultados de 
+uno de los métodos (normal, percentiles y BC_a), el eje x corresponderá al 
+número de intervalo de confianza ($1,...,500$) y en el vertical 
+graficarás los límites de los intervalos, es decir graficarás 2 líneas (usa 
+geom_line) una corresponderá a los límites inferiores de los intervalos, y otra 
+a los superiores.
