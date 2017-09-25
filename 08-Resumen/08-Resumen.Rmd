@@ -1,0 +1,298 @@
+---
+title: "Repaso"
+author: "Teresa Ortiz"
+date: "9/19/2017"
+output:
+  html_document:
+    css: ../codigo-estilos/cajas.css
+    theme: spacelab
+---
+
+
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+theme_set(theme_minimal())
+
+load("../05-bootsrap/datos/base_completa.Rdata")
+
+prim <- tbl_df(primaria) %>%
+    filter(entidad == "DISTRITO FEDERAL", !is.na(esp.3), !is.na(esp.6)) %>%
+    select(clave, turno, tipo = tipo.esc, mun = clave.mun, esp3 = esp.3, 
+        esp6 = esp.6) %>%
+    mutate(tipo = as.character(tipo))
+```
+
+
+### Conceptos de inferencia
+
+La inferencia estadística o "aprender" (como se denota en ciencias de la computación),
+es el proceso de usar datos para inferir la distribución que generó los datos.
+
+Muchos problemas de inferencia se pueden clasificar en alguna de las siguientes
+clases: estimación, intervalos de confianza, o pruebas de hipótesis.
+
+La estimación puntual se refiere a dar un único valor para aproximar una 
+cantidad de interés, es común que la cantidad de interés sea un parámetro del 
+modelo, por ejemplo, la media, la correlación, la mediana o la varianza. Los 
+estimadores *plug-in* de la media, varianza, mediana, ... son estimadores puntuales.
+
+<div class="clicker">
+Ejemplo: Supongamos que tenemos una muestra de 500 primarias de Cd. México y nos
+interesa conocer la media de la calificación en la prueba ENLACE de español.
+Notar que nos interesa la cantidad poblacional y no la media en la muestra.
+
+```{r, cache = TRUE}
+set.seed(17921)
+n <- 500
+N <- nrow(prim)
+prim_muestra <- sample_n(prim, n, replace = TRUE)
+
+# estimador puntual de la media
+(theta_hat <- mean(prim_muestra$esp3))
+
+# valor poblacional
+(theta <- mean(prim$esp3))
+```
+</div>
+
+### Intervalos de confianza
+
+En la primera sección de *bootstrap* nos centramos en estudiar errores estándar, 
+esto es porque los errores estándar se utilizan para aproximar intervalos de 
+confianza de un parámetro $\theta$ de interés. Dados una estimación $\theta$ y 
+una estimación del error estándar $\hat{se}$, el intervalo usual de $90%$ de 
+confianza para $\theta$ es 
+$$(\hat{\theta} - 1.645\hat{se}, \hat{\theta} + 1.645\hat{se})$$
+este es un estimador de intervalo. Usualmente es más útil contar con una 
+estimación de intervalo que con una estimación puntual. Al contar con ambos, 
+nos dicen cual es nuestra mejor propuesta para $\theta$, y que tan lejos puede 
+estar el verdadero valor de nuestra propuesta.
+
+<div class="clicker">
+En nuestro ejemplo estimamos el error estándar usando bootstrap 
+```{r}
+# error estándar bootstrap
+se_hat <- rerun(1000, sample(prim_muestra$esp3, size = n, replace = TRUE)) %>% 
+    map_dbl(mean) %>% 
+    sd()
+se_hat
+```
+
+Y obtenemos el intervalo del 90% de confianza:
+
+```{r}
+round(c(theta_hat - 1.645 * se_hat, theta_hat + 1.645 * se_hat), 1)
+```
+</div>
+
+Ahora, si estamos en la situación donde los 
+datos se obtuvieron simplemente con un muestreo aleatorio de una distribución
+desconocida $P, P\to x = (x_1,...,x_n)$. Sea $\hat{\theta}=t(P_n)$ un estimador
+*plug-in* (estimador puntual) de un parámetro de interés $\theta=t(P)$, y sea
+$\hat{se}$ una estimación bootstrap del error estándar de $\hat{\theta}$. 
+Bajo condiciones bastante generales resulta que conforme el tamaño de muestra 
+$n$ aumenta, la distribución de $\hat{\theta}$ se aproxima más y más a una 
+normal, con media $\theta$ y varianza cercana a $\hat{se}$, 
+
+$$\frac{\hat{\theta} - \theta}{\hat{se}}\overset{\cdot}{\sim} N(0,1)$$
+<div class="clicker">
+Comparemos la distribución de $\hat{\theta}_n$ para distintos tamaños de muestra, 
+tomaremos muestras de tamaño 5, 20, 100 y 500.
+
+```{r}
+calcula_thetas <- function(n){
+    thetas <- rerun(1000, sample(prim$esp3, n, replace = TRUE)) %>% 
+        map_dbl(mean)
+}
+
+sims <- map_df(set_names(c(5, 20, 100, 500), c(5, 20, 100, 500)), ~calcula_thetas(.))
+
+sims %>% 
+    gather(n, theta_hat) %>% 
+    mutate(n = as.numeric(n)) %>% 
+    group_by(n) %>% 
+    mutate(theta_z = (theta_hat - mean(theta_hat)) / sd(theta_hat)) %>% 
+    ggplot() +
+        stat_qq(aes(sample = theta_z), alpha = 0.6) + 
+        geom_abline(color = "gray") +
+        facet_wrap(~n)
+    
+```
+</div>
+
+Entonces, denotemos por $z^{(\alpha)}$ al percentil $100 \cdot \alpha$ de una $N(0,1)$, 
+$z^{(.05)}=-1.645$, $z^{(.95)}=1.645$, $z^{(.025)}=-1.960$ y $z^{(.975)}=1.960$, 
+entonces usando la aproximación de arriba tenemos 
+
+$$P\bigg(z^{(\alpha)} \le \frac{\hat{\theta} - \theta}{\hat{se}}\le z^{(1-\alpha)}\bigg) = 1-2\alpha$$
+que se puede escribir como 
+
+$$P(\theta \in [\hat{\theta}-z^{(1-\alpha)} \cdot \hat{se},  \hat{\theta}-z^{(\alpha)} \cdot \hat{se}]) = 1-2\alpha$$
+
+En general el intervalo $[\hat{\theta}-z^{(1-\alpha)} \cdot \hat{se},  \hat{\theta}-z^{(\alpha)} \cdot \hat{se}]$
+se como intervalo de confianza estándar con nivel de confianza $(1-2\alpha)%$ para $\theta$.
+
+La propiedad de cobertura de este intervalo implica que el  $(1-2\alpha)%$ de 
+las veces, un intervalo construido de esta manera va a contener el verdadero 
+valor $\theta$. Recordemos que se construyó usando la aproximación Normal, y 
+aunque muy útil y con gran aplicación hay ocasiones en los que hay mejores maneras
+de construir intervalos de confianza usando bootstrap.
+
+Notemos que la definición de intervalo de confianza no requiere de errores estándar.
+
+<div class="caja">
+Un **intervalo de confianza** $1-2\alpha$ para un parámetro $\theta$ es un intervalo
+tal que $P(a \le \theta \le) \ge 1-2\alpha$ para todo $\theta \in \Theta$.
+</div>
+
+Y como vimos los percentiles bootstrap son una alternativa cuando la aproximación 
+normal no es razonable.
+
+
+```{r, cache = TRUE}
+library(tidyverse)
+
+load("../05-bootsrap/datos/base_completa.Rdata")
+
+prim <- tbl_df(primaria) %>%
+    filter(entidad == "DISTRITO FEDERAL", !is.na(esp.3), !is.na(esp.6)) %>%
+    select(clave, turno, tipo = tipo.esc, mun = clave.mun, esp3 = esp.3, 
+        esp6 = esp.6) %>%
+    mutate(tipo = as.character(tipo))
+
+set.seed(17921)
+n <- 500
+N <- nrow(prim)
+prim_muestra <- sample_n(prim, n, replace = TRUE)
+
+# estimador de la media
+mean(prim_muestra$esp3)
+
+# valor poblacional
+mean(prim$esp3)
+
+# error estándar fórmula
+sqrt(sum((prim_muestra$esp3 - mean(prim_muestra$esp3)) ^ 2 / n-1)) / sqrt(n)
+
+# error estándar bootstrap
+rerun(1000, sample(prim_muestra$esp3, size = n, replace = TRUE)) %>% 
+    map_dbl(mean) %>% 
+    sd()
+
+# error estándar poblacional
+sqrt(sum((prim$esp3 - mean(prim$esp3)) ^ 2 / N / n))
+```
+
+Es importante recordar que estamos haciendo inferencia y el estimador *plug-in*, 
+el estimador del error estándar y el estimador de intervalo van a cambiar con 
+la muestra.
+
+<div class="clicker">
+¿Y si tomamos otra muestra?
+
+```{r}
+set.seed(102345)
+prim_muestra <- sample_n(prim, n, replace = TRUE)
+
+# estimador de la media
+mean(prim_muestra$esp3)
+
+# error estándar fórmula
+sqrt(sum((prim_muestra$esp3 - mean(prim_muestra$esp3)) ^ 2 / n-1)) / sqrt(n)
+
+# error estándar bootstrap
+rerun(1000, sample(prim_muestra$esp3, size = n, replace = TRUE)) %>% 
+    map_dbl(mean) %>% 
+    sd()
+```
+
+Un muy mal escenario (aunque posible)
+
+```{r}
+prim_muestra <- top_n(prim, n = n, wt = -esp3)
+
+# estimador de la media
+mean(prim_muestra$esp3)
+
+# error estándar fórmula
+sqrt(sum((prim_muestra$esp3 - mean(prim_muestra$esp3)) ^ 2 / n-1)) / sqrt(n)
+
+# error estándar bootstrap
+rerun(2000, sample(prim_muestra$esp3, size = n, replace = TRUE)) %>% 
+    map_dbl(mean) %>% 
+    sd()
+```
+</div>
+
+### Tarea 6. ¿qué pasó?
+Cobertura de intervalos de confianza. En este problema realizarás un ejercicio 
+de simulación para comparar intervalos de confianza. Utiliza la función rnorm
+para simular muestras de tamaño 10 de una distribución 
+normal estándar, el estadístico de interés es $\theta=exp(\mu)$. 
+
+Sigue el siguiente proceso:
+
+i) Genera una muestra aleatoria de una distribución normal estándar de tamaño 10.
+
+ii) Genera 6000 muestras bootstrap y calcula intervalos de confianza del 95\% 
+para $\hat{\theta}$ usando 1) el método normal, 2) percentiles y 3) BC_a.
+
+iii) Revisa si el intervalo de confianza contiene el verdadero valor del parámetro
+($\theta=1$), en caso de que no lo contenga registra si falló por la izquierda 
+(el límite inferior >1) o falló por la derecha (el límite superior <1).
+
+a) Repite el proceso descrito 500 veces y llena la siguiente tabla:
+
+Método     | \% fallo izquierda   | \% fallo derecha  | cobertura (simulaciones)
+-----------|----------------------|-------------------|------------------------ 
+Normal     |                      |                   |
+Percentiles|                      |                   |
+BC_a       |                      |                   |
+
+La columna cobertura es una estimación de la cobertura del intervalo basada en 
+las simulaciones, para calcularla simplemente escribe el porcentaje de los 
+intervalos que incluyeron el verdadero valor del parámetro. Recuerda usar la 
+semilla.
+
+b) Realiza una gráfica de páneles, en cada panel mostrarás los resultados de 
+uno de los métodos (normal, percentiles y BC_a), el eje x corresponderá al 
+número de intervalo de confianza ($1,...,500$) y en el vertical 
+graficarás los límites de los intervalos, es decir graficarás 2 líneas (usa 
+geom_line) una corresponderá a los límites inferiores de los intervalos, y otra 
+a los superiores.
+
+
+```{r}
+library(bootstrap)
+set.seed(38972938)
+calcula_intervalos <- function(n = 10){
+    x <- rnorm(n)
+    theta <- exp(mean(x))    # theta_hat
+    theta_b <- rerun(1000, sample(x, size = n, replace = TRUE)) %>% 
+        map_dbl(~exp(mean(.)))
+    bca <- bcanon(x, nboot = 1000, theta = function(y) exp(mean(y)), alpha = c(0.025, 0.975))$confpoints[,2]  #       intervalos BC_a
+    intervalos <- data_frame(metodo = c("normal", "percent", "BC_a"), 
+        izq = c(theta - 1.96 * sd(theta_b), quantile(theta_b, probs = 0.025), bca[1]),
+        der = c(theta + 1.96 * sd(theta_b), quantile(theta_b, probs = 0.975), bca[2])
+    )
+}
+
+sims_intervalos_10 <- rerun(500, calcula_intervalos()) 
+sims_intervalos %>% 
+    bind_rows() %>% 
+    group_by(metodo) %>%
+        summarise(
+            falla_izq = 100 * sum(izq > 1) / 500, 
+            falla_der = 100 * sum(der < 1) / 500
+            )
+
+sims_intervalos_50 <- rerun(500, calcula_intervalos(n = 50)) 
+sims_intervalos_50 %>% 
+    bind_rows() %>% 
+    group_by(metodo) %>%
+        summarise(
+            falla_izq = 100 * sum(izq > 1) / 500, 
+            falla_der = 100 * sum(der < 1) / 500
+            )
+
+```
