@@ -433,8 +433,9 @@ hist_log <- ggplot(data_frame(theta_boot), aes(x = log(theta_boot))) +
   geom_histogram(fill = "gray30", binwidth = 0.08) 
 qq_log <- ggplot(data_frame(theta_boot)) +
     geom_abline(color = "red", alpha = 0.5) +
-    stat_qq(aes(sample = theta_boot), 
-        dparams = list(mean = mean(theta_boot), sd = sd(theta_boot))) 
+    stat_qq(aes(sample = log(theta_boot)), 
+        dparams = list(mean = mean(log(theta_boot)), sd = sd(log(theta_boot)))) 
+
 grid.arrange(hist_log, qq_log, ncol = 2, newpage = FALSE)
 ```
 
@@ -566,6 +567,16 @@ Usando la implementación del paquete bootstrap:
 ```{r}
 var_sesgada <- function(x) sum((x - mean(x)) ^ 2) / length(x)
 bcanon(x = spatial[, 1], nboot = 2000, theta = var_sesgada)
+
+b_var <- rerun(1000, var_sesgada(sample(spatial[, 1], size = length(spatial[, 1]), replace = TRUE))) %>% flatten_dbl()
+
+qplot(b_var) + geom_histogram(binwidth = 10)
+
+ggplot(data_frame(b_var)) +
+    geom_abline(color = "red", alpha = 0.5) +
+    stat_qq(aes(sample = b_var), 
+        dparams = list(mean = mean(b_var), sd = sd(b_var))) +
+  geom_abline()
 ```
 
 ![](../imagenes/manicule2.jpg) Comapara el intervalo anterior con los intervalos
@@ -587,19 +598,6 @@ estimar usando bootstrap:
 $$\hat{H}(r)=\frac{1}{B}\sum_{b=1}^B I(R^*_b \le r)$$
  y obtenemos
 $$C_n=(2\hat{\theta} - \hat{\theta}^*_{1-\alpha}, 2\hat{\theta} + \hat{\theta}^*_{1-\alpha})$$
-
-```{r, echo=FALSE,eval=FALSE}
-R_boot <- kurt$V1 - theta_hat
-Hhat <- function(r){
-  1 / B * sum(R_boot <= r)
-}
-```
-
-
-```{r}
-ls_pivotal <-  round(2 * theta_hat - quantile(kurtosis, prob = 0.025), 2)
-li_pivotal <-  round(2 * theta_hat - quantile(kurtosis, prob = 0.975), 2)
-```
 
 
 

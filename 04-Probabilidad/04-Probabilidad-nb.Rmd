@@ -5,9 +5,6 @@ output:
   html_document:
     css: ../codigo-estilos/cajas.css
     theme: spacelab
-  html_notebook:
-    css: ../codigo-estilos/cajas.css
-    theme: spacelab
 ---
 
 
@@ -398,11 +395,14 @@ Remark técnico: si omega es infinito se asume que hay una regla de suma
 similar para particiones de un evento en una sucesión infinita -->
 
 #### Distribución empírica
+
+<div class="caja">
 Sea $(x_1,x_2,...,x_n)$ una lista de $n$ números, podemos pensar que $x_i$ es la 
 i-ésima medida de algo en una serie de mediciones. La distribución empírica de
 la lista de $n$ números es la distribución en la línea $(-\infty, \infty)$ 
 definida como 
 $$P_n(a,b)=\#\{i: 1 \le i \le n, a < x_i < b\}/n$$
+</div>
 
 Esto es, $P_n(a,b)$ es la proporción de los $n$ números en la lista que se 
 ubican en el intervalo $(a,b)$. Para entender la interpretación probabilista, 
@@ -527,7 +527,7 @@ probabilidad de ganar condicional a que se extrajo un sobre negro?
 
 
 ![](../imagenes/manicule2.jpg) En el juego de bridge, se dividen las 52 cartas 
-en 4 jugadores -llamados Este, Oeste, Norte y Sur, si Norte y Sur:  
+en 4 jugadores -llamados Este, Oeste, Norte y Sur,  
 
 * ¿cuál es la probabilidad de que Este tenga 3 espadas?  
 
@@ -597,14 +597,16 @@ $P(A)$ es el promedio de 2 probabilidades condicionales $P(A\vert B)$ y $P(A\ver
 donde los pesos son $P(B)$ y $P(B^c)$:
 $$P(A) = P(A\vert B)P(B) + P(A\vert B^c)P(B^c)$$
 
+<div class="caja">
 El evento $B$ define una partición del espacio de resultados $\Omega$ en 2
 eventos $B$ y $B^c$, podemos extender la fórmula a un caso más general: sean
 $B_1, B_2, ..., B_n$ una partición del espacio de resultados $\Omega$, para 
 cualquier evento $A$, los eventos $A\cap B_1,...,A\cap B_n$ forman una partición
 de $A$, por lo tanto
-$$P(A)=P(A\cap B_1)+\cdot\cdot\cdot+A\cap B_n$$
+$$P(A)=P(A\cap B_1)+\cdot\cdot\cdot+P(A\cap B_n)$$
 y si aplicamos la regla de la  multiplicación a cada término,
 $$P(A) = P(A\vert B_1)P(B_1)+\cdot\cdot\cdot+P(A\vert B_n)P(B_n)$$
+</div>
 
 ##### Ejemplo: muestreo con/sin reemplazo
 Supongamos que seleccionamos (al azar) dos cartas de una baraja, ¿cuál es la 
@@ -655,6 +657,7 @@ resultados,
 $$P(B_i\vert A) = \frac{P(A\vert B_i)P(B_i)}{P(A\vert B_1)P(B_1)+ \cdot\cdot\cdot + 
 P(A\vert B_n)P(B_n)}$$
 </div>
+
 ![](../imagenes/manicule2.jpg) [La intuición es engañosa](http://www.amazon.com/The-Drunkards-Walk-Randomness-Rules/dp/0307275175): En estudios en Alemania y EUA, investigadores
 le pidieron a médicos que estimaran la probabilidad de que una mujer 
 asintomática entre los 40 y 50 años tuviera cáncer de mama si su mamograma 
