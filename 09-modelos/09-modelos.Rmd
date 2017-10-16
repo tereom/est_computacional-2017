@@ -1391,7 +1391,7 @@ cd4 <- allvar %>%
         time = visage - baseage
         ) 
 
-ggplot(cd4, aes(x = time, y = cd4_sq, group = person)) +
+ggplot(cd4, aes(x = time, y = y, group = person)) +
     geom_line(alpha = 0.5)
 ```
 
