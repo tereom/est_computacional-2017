@@ -1,0 +1,74 @@
+---
+title: "11-Tarea"
+output: html_document
+---
+
+1. En este ejercicio usaremos los datos _threept_, éstos corresponden a 
+lanzamientos para encestar canastas de 3 puntos, las variables _r_ y _ángulo_
+indican la posición desde donde se lanzó el balón, siendo _r_ la distancia 
+entre el jugador y la canasta y _angle_ el ángulo entre ellos.
+
+```{r}
+threept <- read.csv("tarea/threept.csv")
+head(threept)
+```
+
+
+* ¿La posición en la cancha influye en la probabilidad de éxito (encestar)?
+Piensa en una manera gráfica de visualizar esta pregunta y pruebala usando 
+inferencia gráfica.
+
+2. Se busca estudiar el efecto de pesticidas en el control de cucarachas en 
+departamentos urbanos. Se realiza un experimento deonde se dividen los 
+departamentos en grupo de tratamiento (160 deptos.) y grupo de control 
+(104 deptos.). En cada departamento se mide el número de cucarachas atrapadas
+$y_i$ en un conjunto de trampas. Distintos departamentos tuvieron trampas un 
+número distinto de días, y denotamos por $u_i$ el número de días-trampa en el 
+i-ésimo departamento. Se propone el siguiente modelo: 
+$$y_i \sim Poisson(u_i,exp(X\beta))$$
+donde X reprersenta variables explicativas (predictores), en este caso, 
+consisten en el nivel de cucarachas antes del tratamiento (roach1), una variable
+binaria indicando si se aplica insecticida en el departamento (treatment) y una
+variable binaria indicando si el edificio es de personas mayor (senior). En R el
+modelo se ajusta como sigue:
+
+```{r}
+roachdata <- read.csv("tarea/roachdata.csv", stringsAsFactors = FALSE)
+glm_1 <- glm(y ~ roach1 + treatment + senior, family = poisson, 
+  offset = exposure2, data = roachdata)
+```
+
+* ¿Qué tan bien se ajusta el modelo a los datos? Para responder esta pregunta
+crea 19 datos simulados y grafica un histograma de los datos junto con 
+los datos verdaderos. Para simular del modelo puedes usar el siguiente código:
+
+```{r}
+n <- nrow(roachdata)
+X <- model.matrix(~ roach1 + treatment + senior, family = poisson, 
+  data = roachdata)
+y_hat <- roachdata$exposure2 * exp(X %*% coef(glm_1))
+y_rep <- rpois(n, y_hat)
+```
+
+* ¿En que se diferencían los datos observados de los simulados?
+
+
+3. Neurocientíficos cognitivos investigan que áreas del cerebro se activan 
+durante una tarea específica. Es común que los investigadores observen que un
+área particular del cerebro se encuentra activa y a partir de ello infieran que
+se está llevando a cabo una función cognitiva particuar. En un artículo Poldrack 
+notó que esas inferencias no tenían mucho sustento, y recomendó que se usara la 
+regla de Bayes. Poldrack reportó la siguiente tabla de frecuencias basada en 
+estudios de tareas relacionadas con lenguaje, en la tabla se reporta si la tarea
+esta relacionada con lenguaje y si la región de interés (ROI) estaba activa o 
+inactiva durante la tarea. 
+
+Estudio | Lenguaje | No lenguaje
+--------|----------|-------------
+Activa  | 166      | 199
+Inactiva| 703      | 2154
+
+Supón que se realiza un estudio y se observa que la región de interés esta 
+activa. Si la probabilidad inicial de que la tarea involucre procesamiento de 
+lenguaje es 0.5, ¿cuál es la probabilidad posterior condicional a que la región
+esta activa?
