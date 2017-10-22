@@ -35,12 +35,20 @@ modelo se ajusta como sigue:
 ```{r}
 roachdata <- read.csv("roachdata.csv", stringsAsFactors = FALSE)
 glm_1 <- glm(y ~ roach1 + treatment + senior, family = poisson, 
-  offset = log(exposure2), data = roachdata)
+    offset = log(exposure2), data = roachdata)
 ```
 
 * ¿Qué tan bien se ajusta el modelo a los datos? Para responder esta pregunta
 crea 19 datos simulados y grafica un histograma de los datos junto con 
-los datos verdaderos.
+los datos verdaderos. Para simular del modelo puedes usar el siguiente código:
+
+```{r}
+n <- nrow(roachdata)
+X <- model.matrix(~ roach1 + treatment + senior, family = poisson, 
+  data = roachdata)
+y_hat <- roachdata$exposure2 * exp(X %*% coef(glm_1))
+y_rep <- rpois(n, y_hat)
+```
 
 * ¿En que se diferencían los datos observados de los simulados?
 
