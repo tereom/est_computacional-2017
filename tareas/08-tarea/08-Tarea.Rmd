@@ -25,7 +25,7 @@ departamentos en grupo de tratamiento (160 deptos.) y grupo de control
 $y_i$ en un conjunto de trampas. Distintos departamentos tuvieron trampas un 
 número distinto de días, y denotamos por $u_i$ el número de días-trampa en el 
 i-ésimo departamento. Se propone el siguiente modelo: 
-$$y_i \sim Poisson(u_i,exp(X\beta))$$
+$$y_i \sim Poisson(u_iexp(X\beta))$$
 donde X reprersenta variables explicativas (predictores), en este caso, 
 consisten en el nivel de cucarachas antes del tratamiento (roach1), una variable
 binaria indicando si se aplica insecticida en el departamento (treatment) y una
@@ -33,25 +33,16 @@ variable binaria indicando si el edificio es de personas mayor (senior). En R el
 modelo se ajusta como sigue:
 
 ```{r}
-roachdata <- read.csv("tarea/roachdata.csv", stringsAsFactors = FALSE)
+roachdata <- read.csv("roachdata.csv", stringsAsFactors = FALSE)
 glm_1 <- glm(y ~ roach1 + treatment + senior, family = poisson, 
-  offset = exposure2, data = roachdata)
+  offset = log(exposure2), data = roachdata)
 ```
 
 * ¿Qué tan bien se ajusta el modelo a los datos? Para responder esta pregunta
 crea 19 datos simulados y grafica un histograma de los datos junto con 
-los datos verdaderos. Para simular del modelo puedes usar el siguiente código:
-
-```{r}
-n <- nrow(roachdata)
-X <- model.matrix(~ roach1 + treatment + senior, family = poisson, 
-  data = roachdata)
-y_hat <- roachdata$exposure2 * exp(X %*% coef(glm_1))
-y_rep <- rpois(n, y_hat)
-```
+los datos verdaderos.
 
 * ¿En que se diferencían los datos observados de los simulados?
-
 
 3. Neurocientíficos cognitivos investigan que áreas del cerebro se activan 
 durante una tarea específica. Es común que los investigadores observen que un
