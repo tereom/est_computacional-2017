@@ -19,3 +19,14 @@ vía simulación). ¿Cuál es la aproximación más cercana a la verdadera
 distribución?
 
 Pista: $se(\hat{\mu}) = 1/\sqrt{n}$
+
+2. La base de datos vancouver.csv contiene promedios de precipitación de 
+mediciones (en mm) provenientes de Vancouver entre 1960 y 1994.
+
+* Utiliza b-splines cúbicos para estudiar la relación entre el día y el 
+promedio registrado. Deberás crear una variable numérica x que represente el día
+y utiliza como nudos los extremos y 3 puntos interiores igualmente espaciados, 
+es decir, tendrás 4 regiones. Grafica la curva estimada.
+
+* Crea bandas de errores estándar usando bootstrap paramético y suponiendo que 
+los errores tienen una distribución normal.
