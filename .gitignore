@@ -4,5 +4,7 @@
 .Ruserdata
 .DS_Store
 *.html
+.html
+*_cache
 04-Probabilidad/04-Probabilidad.Rproj
 04-Probabilidad/04-ejercicios.Rmd
