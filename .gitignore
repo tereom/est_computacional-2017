@@ -6,5 +6,8 @@
 *.html
 .html
 *_cache
+*_files
+.png
 04-Probabilidad/04-Probabilidad.Rproj
 04-Probabilidad/04-ejercicios.Rmd
+
