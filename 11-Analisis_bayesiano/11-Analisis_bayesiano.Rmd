@@ -1,6 +1,6 @@
 ---
 title: "Análisis de datos bayesiano"
-#runtime: shiny
+runtime: shiny
 output:
     html_document:
         css: ../codigo-estilos/cajas.css
@@ -194,26 +194,28 @@ $$p(\text{valores de parámetros y estructura del modelo} | datos)$$
 Una vez que observamos los datos, usamos la regla de Bayes para determinar
 o actualizar nuestras creencias de posibles parámetros y modelos.
 
-Antes de proceder hace falta definir algunos conceptos y notación:
-$$p(\theta|x)=\frac{p(x|\theta)p(\theta)}{p(x)}$$
 
-$p(\theta|x)$ se conoce como la distribución posterior, 
-$p(x|\theta)=\mathcal{L}(\theta)$ es
-la verosimilitud, $p(\theta)$ es la distribución inicial o _a priori_ y $p(x)$
-es la evidencia. 
+Entonces:
 
-+ La **distribución inicial** $p(\theta)$ cuantifica la información de 
-$\theta$ externa a $x$, esto es, la distribución a priori resume nuestras 
-creencias acerca del parámetro ajenas a los datos. 
+<div class="caja">
 
-+ La distribución de **verosimilitud** cuantifica la información de $\theta$ 
-asociada a los datos.
+* Cuantificamos la información (o incertidumbre) acerca del parámetro 
+desconocido $\theta$ mediante distribuciones de probabilidad.  
 
-+ La **evidencia** $p(x)$ es la probabilidad de los datos de acuerdo al modelo, 
-se determina sumando (o integrando) a través de todos los posibles valores de 
-los parámetros, ponderado por la certeza en dichos parámetros.
+* Antes de observar datos $x$, cuantificamos la información de $\theta$ externa 
+a $x$ en una __distribución a priori__ $p(\theta)$, esto es, la distribución a
+priori resume nuestras creencias acerca del parámetro ajenas a los datos. Por
+otra parte, cuantificamos la información de $\theta$ asociada a $x$ mediante la 
+__distribución de verosimilitud__ $p(x|\theta)$.
 
-\subsection{Ejemplo: Ingesta calórica en estudiantes}
+* Combinamos la información a priori y la información que provee $x$ mediante el 
+__teorema de Bayes__ obteniendo así la __distribución posterior__ 
+$p(\theta|x) \propto p(x|\theta)p(\theta)$.
+
+* Las inferencias se obtienen de resúmenes de la distribución posterior.
+</div>
+
+#### Ejemplo: Ingesta calórica en estudiantes
 Supongamos que nos interesa aprender los hábitos alimenticos de los estudiantes
 universitarios en México, y escuchamos que de acuerdo a investigaciones se
 recomienda que un adulto promedio ingiera 2500 kcal. Es así? que buscamos conocer
@@ -228,7 +230,7 @@ datos).
 
 Recordemos que la distribución $p(\theta)$ se conoce como la distribución 
 _a priori_ y representa nuestras creencias de los posibles valores que puede 
-tomar el parámetro. Supongamos que tras leer artí?culos y entrevistar
+tomar el parámetro. Supongamos que tras leer artículos y entrevistar
 especialistas consideramos los posibles valores de $\theta$ y les asigmanos 
 pesos:
 
@@ -312,100 +314,11 @@ anterior.
 * ¿Cómo definirías la distribución inicial si no tuvieras conocimiento de los
 artículos y expertos?
 
-#### Inicial continua
-La proporción $\theta$ es un parámetro continuo por lo que una alternativa a la 
-inicial discreta es definir una incial continua en el $(0,1)$, la distribución 
-Beta es un buen candidato, como podemos ver en la siguiente gráfica, la 
-distribución Beta puede tomar formas muy variadas:
-
-```{r, fig.height=3, fig.width=3.8}
-base <- ggplot(data_frame(x = c(0, 1)), aes(x)) 
-base + 
-    stat_function(fun = dbeta, args = list(shape1 = 1, shape2 = 1), 
-        aes(colour = "a=1; b=1")) + 
-    stat_function(fun = dbeta, args = list(shape1 = 3.26, shape2 = 7.19), 
-        aes(colour = "a=3.3; b=7.2")) + 
-    stat_function(fun = dbeta, args = list(shape1 = 15, shape2 = 10), 
-        aes(colour = "a=15; b=10")) + 
-    stat_function(fun = dbeta, args = list(shape1 = 0.5, shape2 = 0.5), 
-        aes(colour = "a=0.5; b=0.5")) +
-    labs(y = "", title = "Distribución Beta", colour = "")
-```
-
-Esta distribución tiene dos parámetros, $\theta \sim Beta(a,b)$:
-$$p(\theta) = \frac{\theta^{a-1}(1-\theta)^{b-1}}{B(a,b)}$$
-donde $B(a,b)$ es una constante de normalización definida como,
-$$B(a,b)=\frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}$$
-y $\Gamma(x) = \int_0^{\infty}t^{x-1}e^{-t}$, (si $x$ es un entero positivo, 
-$\Gamma(x) = (x-1)!$).
-
-Es difícil escoger directamente los parámetros $a,b$ que describan nuestras 
-creencias,  sin embargo, podemos derivarlos usando los percentiles, si creemos 
-que la mediana y el percentil del $90\%$ de la distribución están dados por 
-$0.3$ y $0.5$ respectivamente, podemos encontrar los parámetros $a,b$ que 
-reflejen esta creencia usando la siguiente función:
-
-```{r}
-quantile1 <- list(p = 0.5, x = 0.3)
-quantile2 <- list(p = 0.9, x = 0.5)
-beta.select(quantile1, quantile2)
-```
-
-Notemos que la verosimilitud
-$$\mathcal{L}(\theta) \propto \theta^{11}(1-\theta)^{19}$$
-también corresponde al $kernel$ de una distribución Beta con parámetros $a = 12$, 
-$b = 20$. Si combinamos la distribución incial con la posterior es fácil ver que 
-la posterior es Beta:
-$$p(\theta|x)\propto \theta^{(a+z)-1}(1 -\theta)^{(N-z+b)-1}$$
-en nuestro ejemplo $a+z=3.26+12$ y $N-z+b=7.19+19$
-
-```{r, fig.height=3, fig.width=4.5}
-L_bernoulli <- function(theta, N, z){
-        theta ^ z * (1 - theta) ^ (N - z)
-    }  
-base +    
-    stat_function(fun = dbeta, args = list(shape1 = 3.26, shape2 = 7.19), 
-        aes(color = "inicial, a=3.26;b=7.19")) + # inicial
-    stat_function(fun = dbeta, args = list(shape1 = 12 + 1, shape2 = 20 - 12 + 1), 
-        aes(color = "verosimilitud, z=12;N=20")) + # verosimilitud
-    stat_function(fun = dbeta, args = list(shape1 = 15.26, shape2 = 26.19), 
-        aes(color = "posterior, a=15.26;b=15.26")) +
-    labs(y = "", colour = "", x = expression(theta))
-```
-
-La media posterior de la distribución Beta es $a/(a+b)$, por lo que la media de la distribución posterior es $0.368$ (cercano al estimador de máxima verosimilitud que sería $11/(11+19) = 0.367$). Una vez que tenemos la distribución posterior podemos responder varias preguntas, por ejemplo: ¿cuál es la probabilidad de que $\theta > 0.5$?, también podemos encontrar la media y la mediana de la distribución y construir intervalos de probabilidad, por ejemplo un intervalo de probabilidad de $90\%$ se encuentra calculando los percentiles $0.5$ y $0.95$ de la distribución posterior.
-
-```{r}
-qbeta(c(0.05, 0.95), 15.26, 26.19)
-```
-
-![](../imagenes/manicule2.jpg) ¿Cómo se ve la distribución posterior cuando 
-aumenta el tamaño de la muestra?
-
-
-Resumiendo la clase pasada, en estadística bayesiana (paramétrica):
-
-* Cuantificamos la información (o incertidumbre) acerca del parámetro 
-desconocido $\theta$ mediante distribuciones de probabilidad.  
-
-* Antes de observar datos $x$, cuantificamos la información de $\theta$ externa 
-a $x$ en una __distribución a priori__ $p(\theta)$, esto es, la distribución a
-priori resume nuestras creencias acerca del parámetro ajenas a los datos. Por
-otra parte, cuantificamos la información de $\theta$ asociada a $x$ mediante la 
-__distribución de verosimilitud__ $p(x|\theta)$.
-
-* Combinamos la información a priori y la información que provee $x$ mediante el 
-__teorema de Bayes__ obteniendo así la __distribución posterior__ 
-$p(\theta|x) \propto p(x|\theta)p(\theta)$.
-
-* Las inferencias se obtienen de resúmenes de la distribución posterior.
-
+#### Evidencia
 Ahora, en el teorema de Bayes también encontramos el término $p(x)$ que 
 denominamos la __evidencia__, esta última también se conoce como verosimilitud
 marginal o inicial predictiva. 
 $$p(\theta|x)=\frac{p(x|\theta)p(\theta)}{p(x)}$$
-
-#### Evidencia
 
 La evidencia es la probabilidad de los datos de acuerdo al modelo y se calcula
 sumando a lo largo de todos los posibles valores de los parámetros y ponderando
@@ -771,6 +684,8 @@ distribución y extraer valores numéricos como la media.
 
 ```{r, fig.height=3, fig.width=6}
 N = 14; z = 11; a = 1; b = 1
+base <- ggplot(data_frame(x = c(0, 1)), aes(x)) 
+
 p1 <- base +
     stat_function(fun = dbeta, args = list(shape1 = a, shape2 = b), 
         aes(colour = "inicial"), show.legend = FALSE) + 
@@ -799,7 +714,7 @@ grid.arrange(p1, p2, nrow = 1, widths = c(0.38, 0.62))
 Este html puede ser interactivo, para ver la aplicación de shiny debes correr el 
 Rmd de manera local (*Run Document*). 
 
-```{r shiny_bernoulli, echo=FALSE, error=TRUE}
+```{r shiny_bernoulli, echo=FALSE, error=TRUE, cache=FALSE}
 shinyAppDir("app_bernoulli", options = list(width = "100%", height = 500))
 ```
 
@@ -1041,7 +956,8 @@ el vendedor este en alguna de las islas coincide con la población relativa de
 la isla. 
 
 ```{r, fig.height=6, fig.width=3.5}
-islas <- data.frame(islas = 1:10, pob = 1:10)
+islas <- data.frame(islas = 1:10, pob = 
+        rep(1, 10))
 
 caminaIsla <- function(i){ # i: isla actual
   u <- runif(1) # volado
