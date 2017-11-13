@@ -1,11 +1,13 @@
 ---
 title: "Análisis de datos bayesiano"
-runtime: shiny
+
 output:
     html_document:
         css: ../codigo-estilos/cajas.css
         theme: spacelab
 ---
+
+<!-- runtime: shiny -->
 
 ```{r options, echo = FALSE, message=FALSE, error=TRUE, warning=FALSE}
 knitr::opts_chunk$set(
@@ -714,7 +716,7 @@ grid.arrange(p1, p2, nrow = 1, widths = c(0.38, 0.62))
 Este html puede ser interactivo, para ver la aplicación de shiny debes correr el 
 Rmd de manera local (*Run Document*). 
 
-```{r shiny_bernoulli, echo=FALSE, error=TRUE, cache=FALSE}
+```{r shiny_bernoulli, echo=FALSE, error=TRUE, cache=FALSE, eval = FALSE}
 shinyAppDir("app_bernoulli", options = list(width = "100%", height = 500))
 ```
 
@@ -956,8 +958,7 @@ el vendedor este en alguna de las islas coincide con la población relativa de
 la isla. 
 
 ```{r, fig.height=6, fig.width=3.5}
-islas <- data.frame(islas = 1:10, pob = 
-        rep(1, 10))
+islas <- data.frame(islas = 1:10, pob = 1:10)
 
 caminaIsla <- function(i){ # i: isla actual
   u <- runif(1) # volado
@@ -1285,6 +1286,13 @@ están lejos del valor actual se ubicarán en zonas de menor densidad y
 $p(\theta_{propuesta})/p(\theta_{actual})$ tenderá a ser chico y el movimiento
 propuesto será aceptado en pocas ocasiones.
 
+![](../imagenes/manicule2.jpg) ¿Qué porcentaje de los valores propuestos son 
+aceptados? Si cambias la desviación estándar de la distribución propuesta a
+$\sigma = 0.01$ y $\sigma = 2$, ¿Cómo cambia el porcentaje de aceptación de
+valores propuestos? ¿De los 3 valores que usamos, qué desviación estándar crees 
+que sea más conveniente?
+
+
 De la muestra de valores de $p(\theta|x)$ obtenidos usando el algoritmo de
 Metrópolis podemos estimar aspectos de la verdadera distribución $p(\theta|x)$.
 Por ejemplo, para resumir la tendencia central es fácil calcular la media y 
@@ -1302,8 +1310,6 @@ sims_y <- rbinom(nrow(caminata_f), size = 1, prob = caminata_f$theta)
 mean(sims_y) # p(y = 1 | x) probabilidad predictiva
 sd(sims_y)
 ```
-
-![](../imagenes/manicule2.jpg)
 
 
 ### Inferencia de dos proporciones binomiales
@@ -1363,83 +1369,79 @@ $$p(\theta_1, \theta_2)=\frac{\theta_1^{a_1-1}(1-\theta)^{b_1-1}} {B(a_1, b_1)}\
 
 donde $B(a, b) = \Gamma(a)\Gamma(b) / \Gamma(a+b)$.
 
-```{r, fig.width=4.5, fig.height=4.5}
-grid <- expand.grid(x = seq(0.01, 1, 0.01), y = seq(0.01, 1, 0.01))
-grid <- grid %>% 
-  mutate(z = dbeta(x, 3, 3) * dbeta(y, 3, 3))
-
-ggplot(grid, aes(x = x, y = y, z = z)) + 
-  # geom_tile(aes(fill = z)) +
-  stat_contour(binwidth = 0.6, aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
-  scale_y_continuous(expression(theta[2]), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
-  coord_fixed()
-
-```
-
-```{r, eval=FALSE, echo=FALSE}
-# plot 3d
-library(plot3D)
-par(mar = c(2, 2, 2, 2))
-par(mfrow = c(1, 1))
-x <- seq(0.0, 1, 0.02)
-y <- seq(0.0, 1, 0.02)
-M <- mesh(x, y)
-
-surf3D(x = M$x, y = M$y, z = dbeta(M$x, 3, 3) * dbeta(M$y, 3, 3), 
-  colvar = FALSE, col = "gray", border = "black", bty = "n", xlim = c(0, 1), 
-  ylim = c(0, 1), zlim = c(0, 8.6), d = 1.5)
-```
-
-La verosimilitud se pude graficar como,
-
-```{r, fig.width=4.5, fig.height=4.5}
-# z_1=5, N_1=7, z_2=2, N_2=7, a_1=a_2=b_1=b_2=3
-grid <- grid %>% 
-  mutate(z = dbeta(x, 6, 3) * dbeta(y, 3, 6))
-
-ggplot(grid, aes(x = x, y = y, z = z)) + 
-  # geom_tile(aes(fill = z)) +
-  stat_contour(binwidth = 0.6, aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
-  scale_y_continuous(expression(theta[2]), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
-  coord_fixed()
-```
-
-```{r, eval=FALSE, echo=FALSE}
-surf3D(x = M$x, y = M$y, z = dbeta(M$x, 6, 3) * dbeta(M$y, 3, 6), 
-  colvar = FALSE, col = "gray", border = "black", bty = "n",
-  xlim = c(0, 1), ylim = c(0, 1), zlim = c(0, 8.6), d = 1.5)
-```
-
-la posterior se escribe:
+La posterior se escribe:
 
 $$p(\theta_1, \theta_2|x)=\frac{\theta_1^{z_1+a_1-1}(1-\theta)^{b_1-1}\cdot \theta_2^{z_2+a_2-1}(1-\theta)^{b_2-1}}{p(x)\cdot B(a_1, b_1) \cdot B(a_2, b_2)}$$
-
-```{r, fig.width=4.5, fig.height=4.5}
-# z_1=5, N_1=7, z_2=2, N_2=7
-grid <- grid %>% 
-  mutate(z = dbeta(x, 8, 5) * dbeta(y, 5, 8))
-  
-ggplot(grid, aes(x = x, y = y, z = z)) + 
-  # geom_tile(aes(fill = z)) +
-  stat_contour(binwidth = 0.6, aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
-  scale_y_continuous(expression(theta[2]), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
-  coord_fixed()
-```
-
 Resumiendo, cuando la inicial es el producto de distribuciones beta 
 independientes, la posterior también es el producto de distribuciones beta
 independientes.
 
-```{r, eval=FALSE, echo=FALSE}
-surf3D(x = M$x, y = M$y, z = dbeta(M$x, 8, 5) * dbeta(M$y, 5, 8), 
-  colvar = FALSE, col = "gray", border = "black", bty = "n",
-  xlim = c(0, 1), ylim = c(0, 1), zlim = c(0, 8.6),  d = 1.5)
+Veamos las gráficas.
+
+
+```{r, fig.width=9.5, fig.height=4.5}
+grid <- expand.grid(x = seq(0.01, 1, 0.01), y = seq(0.01, 1, 0.01))
+grid_inicial <- grid %>% 
+  mutate(z = dbeta(x, 3, 3) * dbeta(y, 3, 3))
+
+binom_2_inicial <- ggplot(grid_inicial, aes(x = x, y = y, z = z)) + 
+  # geom_tile(aes(fill = z)) +
+    geom_raster(aes(fill = z), show.legend = FALSE) +
+    geom_contour(colour = "white") +
+    # stat_contour(binwidth = 0.6, aes(color = ..level..), show.legend = FALSE) +
+    scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
+    scale_y_continuous(expression(theta[2]), limits = c(0, 1)) +
+    scale_color_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
+    scale_fill_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
+    coord_fixed() +
+    labs(title = "Inicial")
+
+# z_1=5, N_1=7, z_2=2, N_2=7, a_1=a_2=b_1=b_2=3
+grid_v <- grid %>% 
+  mutate(z = dbeta(x, 6, 3) * dbeta(y, 3, 6))
+
+binom_2_verosimilitud <- ggplot(grid_v, aes(x = x, y = y, z = z)) + 
+    geom_raster(aes(fill = z), show.legend = FALSE) +
+    geom_contour(colour = "white") +
+    # stat_contour(binwidth = 0.6, aes(color = ..level..), show.legend = FALSE) +
+  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
+  scale_y_continuous(expression(theta[2]), limits = c(0, 1)) +
+  scale_color_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
+        scale_fill_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
+  coord_fixed() +
+    labs(title = "Verosimilitud")
+
+# z_1=5, N_1=7, z_2=2, N_2=7
+grid_post <- grid %>% 
+  mutate(z = dbeta(x, 8, 5) * dbeta(y, 5, 8))
+  
+binom_2_posterior <- ggplot(grid_post, aes(x = x, y = y, z = z)) + 
+    geom_raster(aes(fill = z)) +
+    geom_contour(colour = "white", show.legend = FALSE) +
+    # stat_contour(binwidth = 0.6, aes(color = ..level..), show.legend = FALSE) +
+  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
+  scale_y_continuous(expression(theta[2]), limits = c(0, 1)) +
+  # scale_color_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
+    scale_fill_gradient(expression(p(theta[1],theta[2])), limits = c(0, 8.6)) +
+  coord_fixed() +
+    labs(title = "Posterior")
+
+grid.arrange(binom_2_inicial, binom_2_verosimilitud, binom_2_posterior, 
+    nrow = 1, widths = c(0.3, 0.3, 0.4))
+```
+
+```{r, fig.width = 3.2, fig.height= 3.2}
+library(plotly)
+grid_inicial_pl <- grid_inicial %>% spread(y, z) %>% as.matrix()
+pl_inicial <- plot_ly(z = grid_inicial_pl) %>% add_surface(cmin = 0, cmax = 9)
+grid_v_pl <- grid_v %>% spread(y, z) %>% as.matrix()
+pl_verosimilitud <- plot_ly(z = grid_v_pl) %>% add_surface(cmin = 0, cmax = 9)
+grid_post_pl <- grid_post %>% spread(y, z) %>% as.matrix()
+pl_post <- plot_ly(z = grid_post_pl) %>% add_surface(cmin = 0, cmax = 9)
+
+pl_inicial
+pl_verosimilitud
+pl_post
 ```
 
 ### Metrópolis
@@ -1557,7 +1559,7 @@ $$p(\theta_k,|\theta_1,...,\theta_{k-1},\theta_{k+1},...,\theta_p,x)$$
 El proceso del muestreador de Gibbs es una caminata aleatoria a lo largo del 
 espacio de parámetros. La caminata inicia en un punto arbitrario y en cada 
 tiempo el siguiente paso depende únicamente de la posición actual. Por tanto
-el muestredor de Gibbs es un proceso cadena de Morkov vía Monte Carlo. La 
+el muestredor de Gibbs es un proceso cadena de Markov vía Monte Carlo. La 
 diferencia entre Gibbs y Metrópolis radica en como se deciden los pasos. 
 
 En el caso de Gibbs, en cada punto de la caminata se selecciona uno de los
@@ -1752,7 +1754,7 @@ $$p(\sigma^2) \propto p(x|\mu,\sigma^2)p(\sigma^2)$$
 
 obtenemos que $\sigma^2|x \sim GI(N/2+\alpha, \beta + 1/2 \sum(x_i - \mu)^2)$.
 
-Por tantyo tenemos que la inicial Gamma con verosimilitud Normal es una familia
+Por tanto tenemos que la inicial Gamma con verosimilitud Normal es una familia
 conjugada.
 
 **Normal con media y varianza desconocidas**. Sea $\theta=(\mu, \sigma^2)$  especificamos la siguiente inicial para $\theta$:
@@ -1764,23 +1766,29 @@ $$= \frac{1}{(\sigma^2)^{N/2}}
   exp\bigg(-\frac{1}{2\sigma^2}\sum_{i=1}^N (x_i-\mu)^2 \bigg)
   exp\bigg(-\frac{1}{2\tau^2}(\mu-m)^2)\bigg) 
   \frac{1}{(\sigma^2)^{\alpha +1}}
-  exp\bigg(-\frac{\beta}{\sigma^2}\bigg)
-$$
+  exp\bigg(-\frac{\beta}{\sigma^2}\bigg)$$
 
 en esta última distribución no reconocemos el núcleo de niguna distribución 
 conocida pero si nos concenteramos únicamente en los términos que involucran
 a $\mu$ tenemos: 
+
 $$exp\left(-\frac{1}{2}\left( \mu^2 \left( \frac{N}{\sigma^2} + 
 \frac{1}{\tau^2} \right) 
-- 2\mu\left(\frac{\sum_{i= 1}^n x_i}{\sigma^2} + \frac{m}{\tau^2}\right) \right)\right)  $$
+- 2\mu\left(\frac{\sum_{i= 1}^n x_i}{\sigma^2} + \frac{m}{\tau^2}\right) \right)\right)$$
+
 esta expresión depende de $\mu$ y $\sigma^2$, sin embargo condicional a $\sigma^2$ observamos el núcleo de una distribución normal,
+
 $$\mu|\sigma^2,x \sim N\left(\frac{n\tau^2}{n\tau^2 + \sigma^2}\bar{x} +  \frac{\sigma^2}{N\tau^2 + \sigma^2}m, \frac{\tau^2\sigma^2}{n\tau^2 + \sigma^2} \right)$$
 Si nos fijamos únicamente en los tárminos que involucran a $\sigma^2$ tenemos:
+
 $$\frac{1}{(\sigma^2)^{N/2+\alpha+1}}exp\left(- \frac{1}{\sigma^2}
 \left(\sum_{i=1}^N \frac{(x_i-\mu)^2}{2} + \beta \right) \right)$$
+
 y tenemos 
+
 $$\sigma^2|\mu,x \sim GI\left(\frac{N}{2} + \alpha, \sum_{i=1}^n \frac{(x_i-\mu)^2}{2} + \beta \right)$$
-Obtenemos así las densidades condicionales completas $p(\mu|\sigma^2, x)$ y $p(\sigma^2|\mu, x)$ cuyas distribuciones conocemos y de las cuales podemos 
+Obtenemos así las densidades condicionales completas $p(\mu|\sigma^2, x)$ y 
+$p(\sigma^2|\mu, x)$ cuyas distribuciones conocemos y de las cuales podemos 
 simular. 
 
 Implementaremos un muestreador de Gibbs. 
@@ -1866,7 +1874,7 @@ $$p(y) =\int p(y|\theta)p(\theta|x)d\theta$$
 
 Por tanto podemos aproximar la distribución predictiva posterior como:
 
-```{r}
+```{r, fig.height=3.5, fig.width=3.5}
 caminata_f <- filter(caminata, pasos > 5000)
 
 caminata_f$y_sims <- rnorm(1:nrow(caminata_f), caminata_f$mu, caminata_f$sigma2)
@@ -1897,24 +1905,171 @@ desde R. Es muy fácil utilizar estos programas pues uno simplemente debe
 especificar las distribuciones iniciales, la verosimilitud y los datos 
 observados. 
 
-Repitamos nuestro ejemplo usando JAGS, es importante tomar en cuenta que en JAGS
-la distribución Normal esta parametrizada con la presición. 
+#### Especificación del modelo
 
-La distribución inicial y la verosimilitud se especifican en el modelo:
+Repitamos el caso del sesgo de la modela usando JAGS. Vale la pena realizar un 
+diagrama.
+
+```{r, fig.height=2.5}
+library(DiagrammeR)
+grViz("
+digraph betabinom {
+
+  # a 'graph' statement
+  graph [overlap = true]
+
+  node [shape = box,penwidth = 0.1, fixedsize = true, fontsize = 9,
+        fontname = Helvetica, width = 0.2, height = 0.2]
+  ab[label = 'a,b']; 
+
+  node [shape = circle,
+        fixedsize = true, fontsize = 9,
+        fontname = Helvetica, width = 0.2] // sets as circles
+  theta[label = '&theta;']; y;
+
+  # several 'edge' statements
+  edge[color = grey, arrowsize = 0.5, penwidth = 0.5]
+  ab->theta; theta->y;
+}
+")
+```
+
+El diagrama captura las dependencias entre los datos y los parámetros y 
+veremos que puede facilitar la implementación en JAGS pues cada flecha en
+el diagrama corresponde a una línea de código en la especificación del modelo.
 
 ```{r}
-modelo_normal.txt <-
-'
-model{
-  for(i in 1:N){
-    x[i] ~ dnorm(mu, nu)
-  }
-  # iniciales
-  nu ~ dgamma(3, 3)
-  sigma2 <- 1 / nu
-  mu ~ dnorm(1.5, 1 / 16) 
+modelo_bb.bugs <-
+    '
+    model{
+        for(i in 1:N){
+            x[i] ~ dbern(theta)
+        }
+        # inicial
+        theta ~ dbeta(1, 1)
+    }
+    '
+```
+
+el ciclo for indica que cada dato observado $x_i$ proviene de una distribución Bernoulli con parámetro $\theta$. Afuera del ciclo
+escribimos las distribución inicial, $\theta \sim Beta(1, 1)$.
+
+#### Inicializar cadenas
+
+El modelo ya esta especificado, aun debemos indicar los valores de las
+variables en el modelo, para esto definimos los valores en R y después los mandamos a JAGS.
+
+```{r, echo=FALSE}
+# N = 14; z = 11
+N <- 14
+x <- c(rep(0, 3), rep(1, 11))
+```
+
+Falta especificar el valor inicial de $\theta$, JAGS tiene una manera de hacerlo automaticamente, pero muchas veces vale la pena tener control de los valores iniciales. En ocasiones la eficiencia del proceso puede incrementar si seleccionamos valores iniciales razonables. Kruschke sugiere utilizar como puntos iniciales los estimadores de máxima verosimilitud, esto es porque usualmente la distribución posterior no esta muy lejana de la función de verosimilitud. En este caso el estimador de máxima verosimilitud para $\theta$ es $\hat{\theta}=z/N$.
+
+```{r}
+theta_init <- sum(x) / N
+```
+
+Esta manera de especificar los valores iniciales no siempre se recomienda pues cuando queremos evaluar la convergencia de la cadena muchas veces se sugiere correr varias cadenas con puntos iniciales muy dispersos a lo largo del espacio de parámetros, de tal manera que cuando las cadenas convergen se pueda determinar que la etapa de calentamiento a terminado. Un punto medio es iniciar las cadenas en un 
+punto aleatorio cercano al estimador de máxima verosimilitud.
+
+```{r}
+init_theta <- function(){
+    x_s <- sample(x, replace = TRUE)
+    return(list(theta = sum(x_s) / N))
 }
-'
+```
+
+#### Generar las cadenas
+
+Ahora llamamos a JAGS y generamos las cadenas. Para esto usaremos el paquete 
+`R2jags`, otro paquete para llamar JAGS desde R es `rjags`.
+
+```{r}
+library(R2jags)
+
+cat(modelo_bb.bugs, file = 'modelo_bb.bugs')
+
+jags_fit <- jags(
+    model.file = "modelo_bb.bugs",    # modelo de JAGS
+    inits = init_theta,   # valores iniciales
+    data = list(x = x, N = N),    # lista con los datos
+    parameters.to.save = c("theta"),  # parámetros por guardar
+    n.chains = 1,   # número de cadenas
+    n.iter = 1000,    # número de pasos
+    n.burnin = 500   # calentamiento de la cadena
+    )
+
+# plot(jags_fit)
+```
+
+Podemos ver un resumen del ajuste:
+
+```{r}
+head(jags_fit$BUGSoutput$summary)
+```
+
+Y graficar la cadena:
+
+```{r}
+traceplot(jags_fit, varname = "theta")
+```
+
+
+<!--
+Para generar la muestra MCMC seguimos 3 pasos: primero JAGS recibe la información y deja que este determine los muestreadores apropiados para el modelo, en el segundo paso corremos las cadenas por un periodo de 
+calentamiento y por último corremos las cadenas y registramos la muestra.
+
+-->
+
+```{r, fig.width=7, fig.height=4, message=FALSE, eval = FALSE, echo = FALSE}
+library(rjags)
+
+cat(modelo_bb.bugs, file = 'modelo_bb.bugs')
+
+# 1 modelo
+jags_bb_model <- jags.model(
+    file = "modelo_bb.bugs",    # modelo de JAGS
+    data = list(x = x, N = N),    # lista con los datos
+    inits = init_theta,   # valores iniciales
+    n.chains = 3,   # número de cadenas
+    n.adapt = 500   # pasos para adaptar el muestreador
+    )
+
+# 2 calentamiento
+update(jags_bb_model, n.iter = 500)
+
+# 3 generar muestra
+jags_bb_samples <-  coda.samples(jags_bb_model, 
+    variable.names = c("theta"), # parámetros a monitorear 
+    n.iter = 1000 # número de iteraciones
+    )
+
+plot(jags_bb_samples)
+```
+
+### Ejemplo normal
+Recordemos el ejemplo normal con media y varianza desconocidas. ¿Cuál es el modelo
+gráfico asociado?
+
+```{r, echo=FALSE}
+N <- 50 # Observamos 20 realizaciones
+set.seed(122)
+x <- rnorm(N, 2, 2) 
+
+modelo_normal.bugs <-
+    '
+    model{
+        for(i in 1:N){
+            x[i] ~ dnorm(mu, nu)
+        }
+        # iniciales
+        nu ~ dgamma(3, 3)
+        sigma2 <- 1 / nu
+        mu ~ dnorm(1.5, 1 / 16) 
+    }
+    '
 ```
 
 el ciclo for indica que cada dato observado $x_i$ proviene de una distribución
@@ -1927,598 +2082,189 @@ El modelo ya esta especificado, aun debemos indicar los valores de las variables
 en el modelo, para esto definimos los valores en R y después los mandamos a 
 JAGS.
 
-```{r, fig.width=7, fig.height=4}
+```{r, fig.width=7, fig.height=4, message=FALSE}
 library(R2jags)
 
-cat(modelo_normal.txt, file = 'modelo_normal.bugs')
+cat(modelo_normal.bugs, file = 'modelo_normal.bugs')
 
 # valores iniciales para los parámetros, si no se especifican la función jags
 # generará valores iniciales
-jags.inits <- function(){
-  list("mu" = rnorm(1, 0, 20),
-    "nu" = 1/runif(0, 100))
+jags_inits <- function(){
+    list(mu = rnorm(1, mean(x), 5), nu = 1 / runif(1, 2, 4))
 }
 
 jags_fit <- jags(
-  model.file = "modelo_normal.bugs",    # modelo de JAGS
-  inits = jags.inits,   # valores iniciales
-  data = list(x = x, N = N),    # lista con los datos
-  parameters.to.save = c("mu", "nu", "sigma2"),  # parámetros por guardar
-  n.chains = 1,   # número de cadenas
-  n.iter = 10000,    # número de pasos
-  n.burnin = 1000,   # calentamiento de la cadena
-  n.thin = 1
-  )
+    model.file = "modelo_normal.bugs",    # modelo de JAGS
+    inits = jags_inits,   # valores iniciales
+    data = list(x = x, N = N),    # lista con los datos
+    parameters.to.save = c("mu", "sigma2"),  # parámetros por guardar
+    n.chains = 1,   # número de cadenas
+    n.iter = 10000,    # número de pasos
+    n.burnin = 1000,   # calentamiento de la cadena
+    n.thin = 1
+    )
 
 jags_fit
 
 # podemos ver las cadenas
 traceplot(jags_fit, varname = c("mu", "sigma2"))
 
-names(jags_fit$BUGSoutput)
 ```
 
-
-* Realiza un histograma de la distribución predictiva. Construye un intervalo
-de 95% de probabilidad para la predicción. Pista: utiliza 
-jags_fit$BUGSoutput$sims.matrix.
+![](../imagenes/manicule2.jpg) Realiza un histograma de la distribución 
+predictiva. Construye un intervalo de 95% de probabilidad para la predicción. 
+Pista: utiliza `jags_fit$BUGSoutput$sims.matrix`.
 
 ```{r, fig.width=7, fig.height=4}
 jags_fit <- jags(
-  model.file = "modelo_normal.bugs",    # modelo de JAGS
-  inits = jags.inits,   # valores iniciales
-  data = list(x = c(NA, x), N = N + 1),    # lista con los datos
-  parameters.to.save = c("mu", "nu", "sigma2", "x"),  # parámetros por guardar
-  n.chains = 1,   # número de cadenas
-  n.iter = 10000,    # número de pasos
-  n.burnin = 1000,   # calentamiento de la cadena
-  n.thin = 1
-  )
-
+    model.file = "modelo_normal.bugs",    # modelo de JAGS
+    inits = list(jags_inits()),   # valores iniciales
+    data = list(x = c(NA, x), N = N + 1),    # lista con los datos
+    parameters.to.save = c("mu", "nu", "sigma2", "x"),  # parámetros por guardar
+    n.chains = 1,   # número de cadenas
+    n.iter = 10000,    # número de pasos
+    n.burnin = 1000,   # calentamiento de la cadena
+    n.thin = 1
+    )
 head(jags_fit$BUGSoutput$summary)
 
-mus <- jags_fit$BUGSoutput$sims.matrix[, 2]
-sigmas <- sqrt(jags_fit$BUGSoutput$sims.matrix[, 4])
-y <- rnorm(length(mus), mus[1], sigmas[1])
+mus <- jags_fit$BUGSoutput$sims.matrix[, "mu"]
+sigmas <- sqrt(jags_fit$BUGSoutput$sims.matrix[, "sigma2"])
+y <- rnorm(length(mus), mus, sigmas)
 
 mean(y)
 sd(y)
-
 ```
 
-#### Diagnósticos
+### Diagnósticos
+Cuando generamos una muestra de la distribución posterior usando MCMC, buscamos que:
 
-Para determinar la convergencia de la cadena es conveniente realizar más de dos
-cadenas, la idea es ver si realmente se ha olvidado el estado inicial viendo
-si las simulaciones de distintas cadenas convergen a una distribución comín.
+1. Los valores simulados sean representativos de la distribución posterior, esto 
+implica que no deben estar influenciados por el valor inicial (arbitrario) y 
+deben explorar todo el rango de la posterior.
 
-```{r}
-jags_fit_pred <- jags(
-  model.file = "modelo_normal.bugs",    # modelo de JAGS
-  inits = jags.inits,   # valores iniciales
-  data = list(x = x, N = N),    # lista con los datos
-  parameters.to.save = c("mu", "nu", "sigma2"),  # parámetros por guardar
-  n.chains = 3,   # número de cadenas
-  n.iter = 50,    # número de pasos
-  n.burnin = 0,   # calentamiento de la cadena
-  n.thin = 1
-  )
+2. Debemos tener suficientes simulaciones de tal manera que las estimaciones 
+sean precisas y estables.
+
+3. Queremos tener un método eficiente para generar las simulaciones.
+
+En la práctica intentamos cumplir lo más posible estos objetivos, pues aunque en
+principio los métodos MCMC garantizan que cadena infinitamente largas lograran 
+una representación perfecta, siempre debemos tener un criterio para cortar la 
+cadena y evaluar la calidad de las simulaciones.
+
+#### Representatividad
+Para determinar la convergencia de la cadena es conveniente realizar más de una 
+cadenas, buscamos ver si realmente se ha olvidado el estado inicial y revisar 
+que algunas cadenas no hayan quedado *atoradas* en regiones inusuales del espacio
+de parámetros.
+
+```{r, fig.height=3.5, fig.width=4.5}
+jags_fit <- jags(
+    model.file = "modelo_normal.bugs",    # modelo de JAGS
+    inits = rerun(3, jags_inits()),   # valores iniciales
+    data = list(x = x, N = N),    # lista con los datos
+    parameters.to.save = c("mu", "nu", "sigma2"),  # parámetros por guardar
+    n.chains = 3,   # número de cadenas
+    n.iter = 50,    # número de pasos
+    n.burnin = 0,   # calentamiento de la cadena
+    n.thin = 1
+    )
 
 # podemos ver las cadenas
 traceplot(jags_fit, varname = c("mu", "sigma2"))
-
 ```
 
-además de realizar gráficas podemos usar la medida de convergencia $\hat{R}$ 
+La gráfica anterior nos puede ayudar a determinar si elegimos un periodo de calentamiento adecuado o si alguna cadena está alejada del resto.
+
+Además de realizar gráficas podemos usar la medida de convergencia $\hat{R}$ 
 que la función_jags_ calcula por omisión:
 
 ```{r}
-jags_fit_pred$BUGSoutput$summary
+jags_fit$BUGSoutput$summary
 ```
 
+
+
 La medida $\hat{R}$ se conoce como el **factor de reducción potencial de 
-escala** este es la posible reducción en la longitud de un intervalo de 
+escala** o *diagnóstico de convergencia de Gelman-Rubin*, este es la posible reducción en la longitud de un intervalo de 
 confianza si las simulaciones continuaran infinitamente. $\hat{R}$ es 
 aproximadamente la raíz cuadrada de la varianza de todas las 
 cadenas juntas dividida entre la varianza dentro de cada cadena. Si $\hat{R}$ es mucho mayor a 1 esto indica que las cadenas no se han mezclado bien. Una regla
 usual es iterar hasta alcanzar un valor $\hat{R} \leq 1.1$ para todos los 
 parámetros.
 
-Adicionalmente las salidas de la función jags incluyen $n.eff$ que es el 
-**número efectivo de simulaciones**, si las simulaciones fueran independientes, 
-$n.eff$ sería el número total de simulaciones; sin embargo, las simulaciones de
-MCMC suelen estar correlacionadas y por tanto el número efetivo de simulaciones 
-es menor. Usualmente nos gustaría obtener un número efectivo de al menos $100$.
+$$\hat{R} = \sqrt{\frac{\hat{d}+3}{\hat{d}+1}\frac{\hat{V}}{W}}$$
 
-### Verosimilitud Bernoulli con inicial jerárquica
+donde $B$ es la varianza entre las cadenas, $W$ es la varianza dentro de las cadenas 
 
-Ahora estudiaremos el caso en el que los parámetros son dependientes. Podríamos
-reflejar el caso en que dos monedas provienen de la misma casa de moneda. En 
-este caso tenemos:
+$$B = \frac{N}{M-1}\sum_m (\hat{\theta_m} - \hat{\theta})^2$$
+$$W = \frac{1}{M}\sum_m \hat{\sigma_m}^2$$
+Y $\hat{V}$ es una estimación del varianza de posteriro de $\theta$:
 
-1. Conocimientos iniciales de los posibles valores de los parámetros (sesgos 
-de las monedas).
+$$\hat{V} = \frac{N-1}{N}W + \frac{M+1}{MN}B$$
 
-2. Tenemos conocimiento inicial de la dependencia de los parámetros por provenir
-de la misma fábrica. 
+#### Precisión
 
-Cuando observamos lanzamientos de las monedas actualizamos nuestras creencias 
-relativas a los sesgos de las monedas y también actualizamos nuestras 
-creencias acerca de la dependencia de los sesgos.
+Una vez que tenemos una muestra representativa de la distribución posterior, 
+nuestro objetivo es asegurarnos de que la muestra es lo suficientemente grande 
+para producir estimaciones estables y precisas de la distribución.
 
-Suponemos una distribución inicial beta. Recordemos que la distribución 
-beta tienen dos parámetors $a$ y $b$:
+Para ello usaremos otra salida de la función jags: $n.eff$ que es el 
+**tamaño efectivo de muestra**, si las simulaciones fueran independientes 
+n.eff` sería el número total de simulaciones; sin embargo, las simulaciones de
+MCMC suelen estar correlacionadas, el tamaño efectivo nos dice que tamaño de 
+muestra de observaciones independientes nos daría la misma información que las
+simulaciones de la cadena.
 
-$$p(\theta)=\frac{1}{B(a,b)}\theta^{a-1}(1-\theta)^{b-1}$$
+$$NEM = \frac{N}{1+2\sum_{k=1}^\infty ACF(k)} $$
 
-Con el fin de hacer los parámetros más intuitivos los podemos expresar en 
-términos de la media $\mu$ y el tamaño de muestra $K$, donde $\mu$ es la media 
-de nuestro conocimiento inicial y la confianza está reflejada en el tamaño de 
-muestra $K$. Entonces los parámetros correspondientes en la distribución 
-beta son:
 
-$$a=\mu K, b = (1-\mu)K$$
+Usualmente nos gustaría obtener un tamaño efectivo de al menos $100$.
 
-Ahora introducimos el modelo jerárquico. En lugar de especificar un valor 
-particular para $\mu$, consideramos que $\mu$ puede tomar distintos valores
-(entre 0 y 1), y definimos una distribución de probabilidad sobre esos valores.
-Podemos pensar que esta distribución describe nuestra incertidumbre acerca de la
-construcción de la máquina que manufactura las monedas. En nuestro ejemplo,
-supongamos que la distribución de $\mu$ es nuevamente beta,
+#### Eficiencia
+Hay varias maneras para mejorar la eficiencia de un proceso MCMC:
 
-$$p(\mu)=beta(\mu|A_{\mu}, B_{\mu})$$
+* Paralelizar, no disminuimos el número de pasos en las simulaciones pero 
+podemos disminuir el tiempo que tarda en correr.
 
-donde $A_{\mu}$ y $B_{\mu}$ se conocen como hiperparámetros y son constantes. En 
-este caso, consideramos que $\mu$ se ubica típicamente cerca de 
-$A_{\mu}/(A_{\mu} + B_{\mu})$ y $K$ se considera constante.
+* Cambiar la parametrización del modelo o transformar los datos. En el caso 
+de variables continuas suele ser conveniente centrar los datos, otra opción es
+utilizar parametrizaciones redundantes.
 
-Veamos como aplica la regla de Bayes, si consideramos este como 
-un problema donde tenemos dos parámetros desconocidos $\mu$ y $\theta$ tenemos
+* Adelgazar la muestra: esto nos puede ayudar a disminuir el uso de memoria, 
+consiste en guardar únicamente los $k$-ésimos pasos de la cadena. Esto resulta
+en cadenas con menos autocorrelación.
 
-$$p(\theta, \mu)=\frac{p(x|\theta,\mu)}{p(\theta,\mu)}{p(x)}$$
+### Recomendaciones generales
 
-Hay dos aspectos a considerar en el problema:
+Gelman recomienda los siguientes pasos cuando uno esta simulando de la posterior:
 
-1. La verosimilitud no depende de $\mu$ por lo que 
-$$p(x|\theta, \mu)=p(x|\theta)$$
+1. Cuando definimos un modelo por primera vez establecemos un valor bajo para 
+_n.iter_ por ejemplo 10 ó 50. La razón es que la mayor parte de las veces los 
+modelos no funcionan a la primera por lo que sería pérdida de tiempo dejarlo 
+correr mucho tiempo antes de descubrir el problema.
 
-2. La distribución inicial en el espacio de parámetros bivariado se puede
-factorizar:
+2. Si las simulaciones no han alcanzado convergencia aumentamos las iteraciones 
+a 500 ó 1000 de tal forma que las corridas tarden segundos o unos cuantos 
+minutos.
 
-$$p(\theta,\mu)=p(\theta|\mu)p(\mu)$$
+3. Si JAGS tarda más que unos cuantos minutos (para problemas del tamaño que 
+veremos en la clase) y aún así no alcanza convergencia entonces _juega_ un poco 
+con el modelo (por ejemplo intenta transformaciones lineales), Gelman sugiere 
+más técnicas para acelerar la convergencia en el capitulo 19 del libro 
+*Data Analysis UsingRegression and Multilevel/Hierarchical models*.
 
-Por lo tanto
-$$p(\theta,\mu|x)=\frac{p(x|\theta,\mu)p(\theta,\mu)}{p(x)}$$
-$$=\frac{p(x|\theta,\mu)p(\theta|\mu)p(\mu)}{p(x)}$$
+4. Otra técnica conveniente cuando se trabaja con bases de datos grandes 
+(sobretodo para la parte exploratoria) es trabajar con un subconjunto de los 
+datos, quizá la mitad o una quinta parte.
 
-#### Aproximación por cuadrícula
 
-Si los parámetros e hiperparámetros toman un número finito de valores y no hay
-muchos de ellos, podemos aproximar la posterior usando aproximación por 
-cuadrícula.
+### Referencias
 
-A continuación graficamos las distribuciones correspondientes al caso en que
-la distribución del hiperparámetro $\mu$ tiene la forma de una distribución 
-Beta(2, 2), es decir creemos que la media de la acuñadora $\mu$ es 0.5, pero 
-existe bastante incertidumbre acerca del valor.
+* (Understanding Computational Bayesian Statistics)[https://www.amazon.com/Understanding-Computational-Bayesian-Statistics-William/dp/0470046090], William M. Bolstad.
 
-La distribución de $\theta$, esto es la distribución inicial que refleja la
-dependencia entre $\theta$ y $\mu$ se expresa por medio de otra distribución 
-beta:
+* (Doing Bayesian Data Analysis)[https://sites.google.com/site/doingbayesiandataanalysis/], 
+John K. Kruschke.
 
-$$\theta|\mu \approx beta(\mu 100, (1-\mu)100)$$
-
-Esta inicial expresa un alto grado de certeza que una acuñadora con 
-hiperparámetro $\mu$ genera monedas con sesgo cercano a $\mu$
-
-
-```{r, fig.width = 5.5,echo=FALSE}
-A_mu <- 2; B_mu <- 2; K <- 100
-
-# Distribución inicial conjunta p(theta, mu)
-p_conjunta <- function(mu, theta, A_mu, B_mu, K){
-  # marginal p(mu)
-  p_mu <- dbeta(mu, A_mu, B_mu)
-  # condicional p(theta | mu)
-  p_theta_mu <- dbeta(theta, mu * K, (1 - mu) * K)
-  p_mu * p_theta_mu
-}
-
-grid_inicial <- expand.grid(theta = seq(0.01, 0.99, 0.005), 
-  mu = seq(0.01, 0.99, 0.005))
-
-grid_inicial <- grid_inicial %>% 
-  mutate(p_inicial = p_conjunta(mu, theta, A_mu, B_mu, K))
-
-plot_conj <- ggplot(grid_inicial, aes(x = theta, y = mu, z = p_inicial)) + 
-  stat_contour(binwidth = 2, aes(color = ..level..)) +
-  scale_x_continuous(expression(theta), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta,mu)), guide = FALSE) 
-
-grid_mu <- grid_inicial %>%
-  group_by(mu) %>%
-  summarise(p_mu = sum(p_inicial)) %>%
-  ungroup() %>%
-  mutate(p_mu = p_mu / sum(p_mu))
-
-plot_mu <- ggplot(grid_mu, aes(x = mu, y = p_mu)) +
-  geom_path() +
-  labs(y = expression(p(paste(mu))), 
-       x = expression(mu)) + 
-  ylim(0, 0.015) + coord_flip()
-
-mus <- rbeta(5000, A_mu, B_mu)
-sims_marg <- data.frame(sims = 1:5000, 
-                        sims_marg = rbeta(5000, mus * 100, (1 - mus) * 100))
-
-plot_theta <- ggplot(sims_marg, aes(x = sims_marg)) + 
-  geom_density(adjust = 2) +
-  labs(y = expression(p(theta)), 
-       x = expression(theta))
-
-# p(theta|mu=0.75)
-sims_cond_1 <- rbeta(5000, 0.75 * 100, (1 - 0.75) * 100)
-# p(theta|mu=0.25)
-sims_cond_2 <- rbeta(5000, 0.25 * 100, (1 - 0.25) * 100)
-
-# marginal = sims_marg
-
-sims <- data.frame(sim = 1:5000, 
-  cond_1 = sims_cond_1, 
-  cond_2 = sims_cond_2) %>%
-  gather(dist, values, -sim) %>%
-  mutate(mu = ifelse(dist == "cond_1", 0.75, 0.25))
-
-
-plots_marginales <- ggplot(sims, aes(x = values)) +
-  labs(y = expression(p(paste(theta, l, mu))), 
-       x = expression(theta)) + 
-  geom_density(adjust = 2) + 
-  facet_wrap(~ mu, ncol = 1)
-
-grid.arrange(plot_conj, plot_mu, plot_theta, plots_marginales, ncol=2)
-
-```
-
-Verosimilitud.
-
-```{r, fig.width=2.7, fig.height = 2.7, echo=FALSE}
-
-likeBern <- function(z, N){
-  function(theta){
-    theta ^ z * (1 - theta) ^ (N - z)
-  }
-}
-
-# Valores observados
-z <- 9; N <- 12
-mi_like <- likeBern(z, N)
-
-grid_like <- expand.grid(x = seq(0.01, 1, 0.05), y = seq(0.01, 1, 0.05))
-grid_like <- grid_like %>% 
-  mutate(z = mi_like(x))
-
-ggplot(grid_like, aes(x = x, y = y, z = z)) + 
-  stat_contour(aes(color = ..level..)) +
-  scale_x_continuous(expression(theta), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(L(theta,mu)), guide = FALSE) +
-  coord_fixed()
-
-# cuadrícula
-grid_post <- grid_inicial %>%
-  mutate(
-    prior = p_inicial / sum(p_inicial),
-    Like = theta ^ z * (1 - theta) ^ (N - z), # verosimilitud 
-    posterior = (Like * prior) / sum(Like * prior)
-  )  
-
-post_conj <- ggplot(grid_post, aes(x = theta, y = mu, z = posterior)) + 
-  stat_contour(aes(color = ..level..)) +
-  scale_x_continuous(expression(theta), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta,mu)), guide = FALSE) 
-```
-
-Posterior.
-
-```{r, eval = TRUE, echo=FALSE}
-# head(grid_post)
-
-grid_mu <- grid_post %>%
-  group_by(mu) %>%
-  summarise(post_mu = sum(posterior)) %>%
-  ungroup() %>%
-  mutate(post_mu = post_mu / sum(post_mu))
-
-post_mu <- ggplot(grid_mu, aes(x = mu, y = post_mu)) +
-  geom_path() +
-  labs(y = expression(p(paste(mu, l, x))), 
-       x = expression(mu))+ coord_flip()
-
-grid_theta <- grid_post %>%
-  group_by(theta) %>%
-  summarise(post_theta = sum(posterior)) %>%
-  ungroup() %>%
-  mutate(post_theta = post_theta / sum(post_theta))
-
-post_theta <- ggplot(grid_theta, aes(x = theta, y = post_theta)) +
-  geom_path() +
-  labs(y = expression(p(paste(theta, l, x))), 
-       x = expression(theta))
-
-grid_theta_m <- grid_post %>%
-  filter(mu == 0.75 | mu == 0.25) %>%
-  group_by(theta, mu) %>%
-  summarise(post_theta = sum(posterior)) %>%
-  group_by(mu) %>%
-  mutate(post_theta = post_theta / sum(post_theta))
-
-post_marginales <- ggplot(grid_theta_m, aes(x = theta, y = post_theta)) +
-  geom_path() + 
-  facet_wrap(~ mu, ncol = 1) +
-  labs(y = expression(p(paste(theta, l, x, mu))), 
-       x = expression(theta))
-```
-
-```{r, fig.width = 5.5,echo=FALSE}
-grid.arrange(post_conj, post_mu, post_theta, post_marginales, ncol=2)
-```
-
-#### Multiples monedas de una misma fábrica
-
-La sección anterior considera el escenario en que lanzamos una moneda y hacemos
-inferencia del parámetro de sesgo $\theta$ y del hiperparámetro $\mu$. Ahora
-consideramos recolectar información de múltiples monedas, si cada moneda tiene
-su propio sesgo $\theta_j$ entonces debemos estimar un parámetro distinto para
-cada moneda.
-
-Suponemos que todas las monedas provienen de la misma fábrica, esto implica 
-que tenemos la misma información inicial $\mu$ para todas las monedas. Suponemos
-también que cada moneda se acuña de manera independiente, esto es, que 
-condicional al parámetro $\mu$ los parámetros $\theta_j$ son independientes 
-en nuestros conocimientos iniciales.
-
-#### Posterior vía aproximación por cuadrícula
-Supongamosque tenemos dos monedas de la misma fábrica. El objetivo es estimar 
-los sesgos $\theta_1$, $\theta_2$ de las dos monedas y estimar simultáneamente
-el parámetro $\mu$ correspondiente a la casa de moneda que las fabricó.
-
-Inicial.
-
-```{r, fig.width=7,echo=FALSE}
-A_mu <- 2; B_mu <- 2; K <- 100
-
-# Distribución inicial p(theta, mu)
-p_conjunta <- function(mu, theta, A_mu, B_mu, K){
-  # marginal p(mu)
-  p_mu <- dbeta(mu, A_mu, B_mu)
-  # condicional p(theta | mu)
-  p_theta_mu <- dbeta(theta, mu * K, (1 - mu) * K)
-  p_mu * p_theta_mu
-}
-
-grid_inicial <- expand.grid(theta = seq(0.01, 0.99, 0.005), 
-  mu = seq(0.01, 0.99, 0.005))
-
-grid_inicial <- grid_inicial %>% 
-  mutate(p_inicial = p_conjunta(mu, theta, A_mu, B_mu, K))
-
-plot_conj_1 <- ggplot(grid_inicial, aes(x = theta, y = mu, z = p_inicial)) + 
-  stat_contour(binwidth = 1, aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta,mu)), guide = FALSE) 
-
-plot_conj_2 <- ggplot(grid_inicial, aes(x = theta, y = mu, z = p_inicial)) + 
-  stat_contour(binwidth = 1, aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[2]), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta,mu)), guide = FALSE) 
-
-
-grid_mu <- grid_inicial %>%
-  group_by(mu) %>%
-  summarise(p_mu = sum(p_inicial)) %>%
-  ungroup() %>%
-  mutate(p_mu = p_mu / sum(p_mu))
-
-plot_mu <- ggplot(grid_mu, aes(x = mu, y = p_mu)) +
-  geom_path() +
-  labs(y = expression(p(paste(mu))), 
-       x = expression(mu)) + 
-  ylim(0, 0.015) + coord_flip()
-
-p_marg <- grid_inicial %>%
-  group_by(theta) %>%
-  summarise(marg = sum(p_inicial)) %>%
-  ungroup() %>%
-  mutate(marg = marg / sum(marg))
-
-plot_marg_1 <- ggplot(p_marg, aes(x = theta, y = marg)) + 
-  geom_path() +
-  labs(y = expression(p(theta[1])), 
-       x = expression(theta[1])) +
-  ylim(0, 0.02)
-
-plot_marg_2 <- ggplot(p_marg, aes(x = theta, y = marg)) + 
-  geom_path() +
-  labs(y = expression(p(theta[2])), 
-       x = expression(theta[2])) +
-  ylim(0, 0.02)
-
-
-grid.arrange(plot_conj_1, plot_conj_2, plot_mu, plot_marg_1, plot_marg_2, 
-             ncol = 3)
-```
-
-Verosimilitud.
-
-```{r, echo=FALSE, fig.width=7, fig.height=2.7, echo=FALSE}
-
-z_1 <- 3; N_1 <- 15
-z_2 <- 4; N_2 <- 5
-
-mi_like_1 <- likeBern(z_1, N_1)
-mi_like_2 <- likeBern(z_2, N_2)
-
-grid_like <- grid_like %>% 
-  mutate(L_1 = mi_like_1(x), 
-         L_2 = mi_like_2(x))
-
-plot_like_1 <- ggplot(grid_like, aes(x = x, y = y, z = L_1)) + 
-  stat_contour(aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(L(theta,mu)), guide = FALSE)
-
-plot_like_2 <- ggplot(grid_like, aes(x = x, y = y, z = L_2)) + 
-  stat_contour(aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(L(theta,mu)), guide = FALSE)
-
-grid.arrange(plot_like_1, plot_like_2, ncol = 3)
-```
-
-Posterior.
-
-```{r, echo=FALSE, fig.width=7}
-grid_post <- grid_inicial %>%
-  mutate(
-    prior = p_inicial / sum(p_inicial),
-    Like_1 = theta ^ z_1 * (1 - theta) ^ (N_1 - z_1), # verosimilitud 
-    posterior_1 = (Like_1 * prior) / sum(Like_1 * prior),
-    Like_2 = theta ^ z_2 * (1 - theta) ^ (N_2 - z_2),
-    posterior_2 = (Like_2 * prior) / sum(Like_2 * prior)
-  )  
-
-post_conj_1 <- ggplot(grid_post, aes(x = theta, y = mu, z = posterior_1)) + 
-  stat_contour(aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[1]), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta[1],mu)), guide = FALSE) 
-
-post_conj_2 <- ggplot(grid_post, aes(x = theta, y = mu, z = posterior_2)) + 
-  stat_contour(aes(color = ..level..)) +
-  scale_x_continuous(expression(theta[2]), limits = c(0, 1)) +
-  scale_y_continuous(expression(mu), limits = c(0, 1)) +
-  scale_color_gradient(expression(p(theta[2],mu)), guide = FALSE) 
-
-grid_mu <- grid_post %>%
-  group_by(mu) %>%
-  summarise(post_mu = sum(posterior_1) * sum(posterior_2)) %>%
-  ungroup() %>%
-  mutate(post_mu = post_mu / sum(post_mu))
-
-post_mu <- ggplot(grid_mu, aes(x = mu, y = post_mu)) +
-  geom_path() +
-  labs(y = expression(p(paste(mu, l, x))), 
-       x = expression(mu)) + 
-  ylim(0, 0.015) + coord_flip()
-
-grid_theta <- grid_post %>%
-  group_by(theta) %>%
-  summarise(post_theta_1 = sum(posterior_1), 
-            post_theta_2 = sum(posterior_2)) %>%
-  ungroup() %>%
-  mutate(post_theta_1 = post_theta_1 / sum(post_theta_1))
-
-post_theta_1 <- ggplot(grid_theta, aes(x = theta, y = post_theta_1)) +
-  geom_path() +
-  labs(y = expression(p(paste(theta[1], l, x))), 
-       x = expression(theta[1])) + ylim(0, 0.020)
-
-post_theta_2 <- ggplot(grid_theta, aes(x = theta, y = post_theta_2)) +
-  geom_path() +
-  labs(y = expression(p(paste(theta[2], l, x))), 
-       x = expression(theta[2])) + ylim(0, 0.020)
-
-grid.arrange(post_conj_1, post_conj_2, post_mu, post_theta_1, post_theta_2, 
-             ncol = 3)
-
-```
-
-### Muestreador de Gibbs
-
-La sección anterior utilizó un modelo simplificado con el objetivo de poder
-visualizar el espacio de parámetros. Ahora incluiremos más parámetros con el 
-objetivo de hacer el problema más realista. En los ejemplos anteriores fijamos
-el grado de dependencia entre $\mu$ y $\theta$ de manera arbitraria, a través
-de $K$, de tal manera que si $K$ era grande, los valores $\theta_j$ individuales
-se situaban cerca de $\mu$ y cuando $K$ era pequeña se permitía más variación.
-
-En situaciones reales no conocemos el valor de $K$ por adelantado, por lo que
-dejamos que los datos nos informen acerca de valores creíbles para $K$. 
-Intuitivamente, cuando la proporción de águilas observadas es similar a lo largo 
-de las monedas, tenemos evidencia de que $K$ es grande, mientras que si estas
-proporciones difieren mucho, tenemos evidencia de que $K$ es pequeña. Debido 
-a que $K$ pasará de ser una constante a ser un parámetro lo llamaremos $\kappa$.
-
-La distribución inicial para $\kappa$ será una Gamma. 
-
-```{r}
-modelo_jer.txt <-
-'
-model{
-  for(t in 1:N){
-    x[t] ~ dbern(theta[coin[t]])
-  }
-  for(j in 1:nCoins){
-    theta[j] ~ dbeta(a, b)
-  }
-  a <- mu * kappa
-  b <- (1 - mu) * kappa
-  # A_mu = 2, B_mu = 2
-  mu ~ dbeta(2, 2)
-  kappa ~ dgamma(1, 0.1)
-}
-'
-```
-
-$\kappa ~Gamma(1, 0.1)$, esta tiene media 10 y desviación estándar 10.
-
-Los datos consisten en 5 monedas, cada una se lanza 5 veces, resultando 4 de 
-ellas en 1 águila y 4 soles y otra en 3 águilas y 2 soles.
-
-```{r, fig.align='center', fig.height = 3}
-cat(modelo_jer.txt, file = 'modelo_jer.bugs')
-
-x <- c(0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1)
-coin <- c(rep(1, 5), rep(2, 5), rep(3, 5), rep(4, 5), rep(5, 5))
-
-jags.inits <- function(){
-  list("mu" = runif(1, 0.1, 0.9),
-    "kappa" = runif(1, 5, 20))
-}
-
-jags_fit <- jags(
-  model.file = "modelo_jer.bugs",    # modelo de JAGS
-  inits = jags.inits,   # valores iniciales
-  data = list(x = x, coin = coin, nCoins = 5,  N = 25),    # lista con los datos
-  parameters.to.save = c("mu", "kappa", "theta"),  # parámetros por guardar
-  n.chains = 3,   # número de cadenas
-  n.iter = 10000,    # número de pasos
-  n.burnin = 1000   # calentamiento de la cadena
-  )
-
-traceplot(jags_fit, varname = c("kappa", "mu", "theta"))
-
-jags_fit
-```
-
-```{r, fig.align='center',fig.width=4,fig.height=4, warning=FALSE}
-sims_df <- data.frame(n_sim = 1:jags_fit$BUGSoutput$n.sims,
-                      jags_fit$BUGSoutput$sims.matrix) %>% 
-  dplyr::select(-deviance) %>%
-  gather(parametro, value, -n_sim)
-
-ggplot(filter(sims_df, parametro != "kappa"), aes(x = value)) +
-  geom_histogram(alpha = 0.8) + facet_wrap(~ parametro)
-
-
-ggplot(filter(sims_df, parametro == "kappa"), aes(x = value)) +
-  geom_histogram(alpha = 0.8)
-```
 
