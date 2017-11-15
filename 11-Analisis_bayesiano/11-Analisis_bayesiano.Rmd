@@ -1910,7 +1910,7 @@ observados.
 Repitamos el caso del sesgo de la modela usando JAGS. Vale la pena realizar un 
 diagrama.
 
-```{r, fig.height=2.5}
+```{r, fig.height=2.5, echo=FALSE}
 library(DiagrammeR)
 grViz("
 digraph betabinom {
@@ -2012,7 +2012,7 @@ head(jags_fit$BUGSoutput$summary)
 
 Y graficar la cadena:
 
-```{r}
+```{r, fig.height=3.5, fig.width=4.5}
 traceplot(jags_fit, varname = "theta")
 ```
 
@@ -2078,11 +2078,11 @@ escribimos las distribuciones iniciales, $\nu \sim Gamma(3, 3)$, esto es
 $\sigma^2 \sim GI(3, 3)$ y $\mu$ se distribuye Normal con media $\mu = 1.5$ y 
 varianza $\tau^2 = 16$.
 
-El modelo ya esta especificado, aun debemos indicar los valores de las variables
+El modelo ya esta especificado, pero aun falta indicar los valores de las variables
 en el modelo, para esto definimos los valores en R y después los mandamos a 
 JAGS.
 
-```{r, fig.width=7, fig.height=4, message=FALSE}
+```{r, fig.width=4.5, fig.height=3.5, message=FALSE}
 library(R2jags)
 
 cat(modelo_normal.bugs, file = 'modelo_normal.bugs')
@@ -2120,7 +2120,7 @@ jags_fit <- jags(
     model.file = "modelo_normal.bugs",    # modelo de JAGS
     inits = list(jags_inits()),   # valores iniciales
     data = list(x = c(NA, x), N = N + 1),    # lista con los datos
-    parameters.to.save = c("mu", "nu", "sigma2", "x"),  # parámetros por guardar
+    parameters.to.save = c("mu", "sigma2", "x"),  # parámetros por guardar
     n.chains = 1,   # número de cadenas
     n.iter = 10000,    # número de pasos
     n.burnin = 1000,   # calentamiento de la cadena
@@ -2253,7 +2253,7 @@ minutos.
 veremos en la clase) y aún así no alcanza convergencia entonces _juega_ un poco 
 con el modelo (por ejemplo intenta transformaciones lineales), Gelman sugiere 
 más técnicas para acelerar la convergencia en el capitulo 19 del libro 
-*Data Analysis UsingRegression and Multilevel/Hierarchical models*.
+*Data Analysis Using Regression and Multilevel/Hierarchical models*.
 
 4. Otra técnica conveniente cuando se trabaja con bases de datos grandes 
 (sobretodo para la parte exploratoria) es trabajar con un subconjunto de los 
@@ -2262,9 +2262,11 @@ datos, quizá la mitad o una quinta parte.
 
 ### Referencias
 
-* (Understanding Computational Bayesian Statistics)[https://www.amazon.com/Understanding-Computational-Bayesian-Statistics-William/dp/0470046090], William M. Bolstad.
+* [Understanding Computational Bayesian Statistics](https://www.amazon.com/Understanding-Computational-Bayesian-Statistics-William/dp/0470046090), William M. Bolstad.
 
-* (Doing Bayesian Data Analysis)[https://sites.google.com/site/doingbayesiandataanalysis/], 
-John K. Kruschke.
+* [Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), John K. Kruschke.
+
+* [Data Analysis Using Regression and Multilevel/Hierarchical models](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman,
+Jennifer Hill.
 
 
