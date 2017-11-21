@@ -20,9 +20,7 @@ library(gridExtra)
 theme_set(theme_minimal())
 ```
 
-### Verosimilitud Bernoulli con inicial jerárquica
-
-Los modelos jerárquicos involucran muchos parámetros de tal manera que las 
+Los modelos jerárquicos involucran varios parámetros de tal manera que las 
 creencias de unos de los parámetros dependen de manera significativa de los 
 valores de otros parámetros. Por ejemplo, consideremos el caso en el que tenemos 
 varias monedas acuñadas en la misma casa de monedas, es razonable pensar que una
@@ -110,7 +108,7 @@ El siguiente modelo gráfico resume las independencias condicionales
 de la última ecuación:
 
 
-```{r}
+```{r, include = FALSE}
 library(DiagrammeR)
 grViz("
 digraph betabinom {
@@ -152,13 +150,12 @@ La distribución de $\theta$, esto es la distribución inicial que refleja la
 dependencia entre $\theta$ y $\mu$ se expresa por medio de otra distribución 
 beta, en el ejemplo usamos K=100:
 
-$$\theta|\mu \approx beta(\mu 100, (1-\mu)100)$$
+$$\theta|\mu \sim beta(\mu 100, (1-\mu)100)$$
 
 Esta inicial expresa un alto grado de certeza que una acuñadora con 
 hiperparámetro $\mu$ genera monedas con sesgo cercano a $\mu$
 
-
-```{r, fig.width = 5.5,echo=FALSE}
+```{r inicial, fig.width = 5.5,echo=FALSE}
 A_mu <- 2; B_mu <- 2; K <- 100
 
 # Distribución inicial conjunta p(theta, mu)
@@ -170,10 +167,10 @@ p_conjunta <- function(mu, theta, A_mu, B_mu, K){
   p_mu * p_theta_mu
 }
 
-grid_inicial <- expand.grid(theta = seq(0.01, 0.99, 0.005), 
+grid <- expand.grid(theta = seq(0.01, 0.99, 0.005), 
   mu = seq(0.01, 0.99, 0.005))
 
-grid_inicial <- grid_inicial %>% 
+grid_inicial <- grid %>% 
   mutate(p_inicial = p_conjunta(mu, theta, A_mu, B_mu, K))
 
 plot_conj <- ggplot(grid_inicial, aes(x = theta, y = mu, z = p_inicial)) + 
@@ -190,13 +187,13 @@ grid_mu <- grid_inicial %>%
 
 plot_mu <- ggplot(grid_mu, aes(x = mu, y = p_mu)) +
   geom_path() +
-  labs(y = expression(p(paste(mu))), 
+  labs(y = expression(p(mu)), 
        x = expression(mu)) + 
   ylim(0, 0.015) + coord_flip()
 
 mus <- rbeta(5000, A_mu, B_mu)
 sims_marg <- data.frame(sims = 1:5000, 
-                        sims_marg = rbeta(5000, mus * 100, (1 - mus) * 100))
+  sims_marg = rbeta(5000, mus * 100, (1 - mus) * 100))
 
 plot_theta <- ggplot(sims_marg, aes(x = sims_marg)) + 
   geom_density(adjust = 2) +
@@ -525,7 +522,7 @@ model{
 '
 ```
 
-$\kappa ~Gamma(1, 0.1)$, esta tiene media 10 y desviación estándar 10.
+$\kappa \sim Gamma(1, 0.1)$, esta tiene media 10 y desviación estándar 10.
 
 Los datos consisten en 5 monedas, cada una se lanza 5 veces, resultando 4 de 
 ellas en 1 águila y 4 soles y otra en 3 águilas y 2 soles.
@@ -560,7 +557,7 @@ jags_fit
 
 ```{r, fig.align='center',fig.width=4,fig.height=4, warning=FALSE}
 sims_df <- data.frame(n_sim = 1:jags_fit$BUGSoutput$n.sims,
-                      jags_fit$BUGSoutput$sims.matrix) %>% 
+  jags_fit$BUGSoutput$sims.matrix) %>% 
   dplyr::select(-deviance) %>%
   gather(parametro, value, -n_sim)
 
@@ -632,7 +629,7 @@ bajo número de expuestos.
 
 ```{r, fig.width=4,fig.height=4,fig.align='center'}
 ggplot(heart, aes(x = log(e), y = 1000* y / e, color = factor(y), label = y)) +
-  geom_text(show_guide = FALSE)  +
+  geom_text(show.legend = FALSE)  +
   scale_x_continuous("Número de expuestos (e)", labels = exp, 
     breaks = c(log(700), log(700*2), log(700*2^2), log(700*2^3), 
       log(700*2^4))) 
@@ -1691,9 +1688,7 @@ ggplot(compara.2, aes(x = log(e), y = media, color = metodo)) +
 
 
 
-### Ejercicio
-
-Implementaremos varios modelos en JAGS, la base de datos que usaremos contiene 
+![](../imagenes/manicule2.jpg) Implementaremos varios modelos en JAGS, la base de datos que usaremos contiene 
 información de mediciones de radón (activity) y del suelo en el que se hicieron 
 las mediciones (floor = $0$ casas con sótano, floor = $1$ casas sin sótano), las 
 mediciones corresponden a $919$ hogares muestreados de $85$ condados de 
@@ -1759,10 +1754,15 @@ donde
 $$\sigma_{\alpha}^2 \sim Unif(0, 100).$$
 
 Entonces, para que una distribución inicial sea noinformariva, su rango de 
-incertidumbre debe ser más amplio que el rando de valores razonables que pueden 
+incertidumbre debe ser más amplio que el rango de valores razonables que pueden 
 tomar los parámetros.
 
 ### Referencias
 
-> [Jim Albert](http://bayes.bgsu.edu/bcwr/), Bayesian Computation With R.
+* [Bayesian Computation With R](http://bayes.bgsu.edu/bcwr/), Jim Albert.
 
+
+* [Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), John K. Kruschke.
+
+* [Data Analysis Using Regression and Multilevel/Hierarchical models](http://www.stat.columbia.edu/~gelman/arm/), Andrew Gelman,
+Jennifer Hill.
