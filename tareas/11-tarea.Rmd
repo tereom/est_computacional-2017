@@ -1,0 +1,135 @@
+---
+title: "Tarea: JAGS"
+output: html_document
+---
+
+### 1. Inferencia de dos proporciones binomiales
+Consideramos la situación en la que nos interesa estudiar dos proporciones 
+$\theta_1$ y $\theta_2$ correspondientes a dos grupos, este es el ejemplo que 
+vimos en clase con distribuciones conjugadas, Metropolis y Gibbs. 
+
+Ahora implementalo en JAGS:
+
+* Asigna una distribución inicial Beta(3, 3) a cada una de las proporciones 
+(vas a suponer independencia de nuestras creencias iniciales). 
+
+* Las observaciones están dadas por el siguiente `data.frame`, consisten en el 
+resultado de 14 lanzamientos, 7 de cada moneda, en la primera observamos 5 
+águilas y en la segunda 2.
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+
+observaciones <- data_frame(
+    moneda = c(rep(1, 7), rep(2, 7)),
+    x = c(rep(0, 2), rep(1, 5), rep(0, 5), rep(1, 2))
+    )
+```
+
+* Genera 3 cadenas y realiza diagnósticos de convergencia, recuerda considerar 
+la etapa de calentamiento.
+
+* Realiza intervalos de confianza para cada proporción binomial, y para la 
+diferencia de las proporciones.
+
+Tip:
+
+El siguiente código especifica el modelo, debes sustituir las `X` con los valores
+de acuerdo a tu script.
+
+```{r, warning=FALSE, message=FALSE}
+library(R2jags)
+
+# N: número de volados (total), M: número de monedas
+modelo_1.bugs <-
+'
+model{
+    for(i in 1:X){
+        x[i] ~ dbern(X[X[i]])
+    }
+    # inicial
+    for(m in 1:X){
+        theta[X] ~ dbeta(3, 3)
+    }
+}
+'
+```
+
+### 2. Regresión
+
+Implementaremos un modelo de regresión en JAGS, la base de datos que
+usaremos contiene información de mediciones de radón (activity)
+y del suelo en el que se hicieron las mediciones (floor = 0 casas con
+sótano, floor = 1 casas sin sótano), las mediciones corresponden a 919
+hogares muestreados de 85 condados de Minnesota. El objetivo es
+construir un modelo de regresión en el que la medición de radón es la
+variable dependiente y el tipo de suelo es la covariable.
+
+El modelo es como sigue:
+
+$$y_i \sim N(\alpha + \beta x_i, \sigma^2)$$
+
+La distribuciones iniciales que usaremos son:
+
+$$\beta \sim N(0, 1000)$$
+$$\sigma^2 \sim U(0, 1000)$$
+
+```{r}
+modelo_regresion.bugs <-
+'
+model{
+  for(i in 1 : n) {
+    y[i] ~ dnorm(y.hat[i], tau.y) 
+    y.hat[i] <- a + b * x[i]
+  }
+  a ~ dnorm(0, 0.001)
+  b ~ dnorm(0, 0.001)
+  tau.y <- pow(sigma.y, -2)
+  sigma.y ~ dunif(0, 100)
+}
+'
+cat(modelo_regresion.bugs, file = 'modelo_regresion.bugs')
+
+### Radon
+load("radon.Rdata")
+
+# Iniciamos preparando los datos para el análisis, trabajaremos en
+# escala logarítmica, hay algunos casos con medición cero, para éstos
+# hacemos una pequeña correción redondeándolos a 0.1.
+y <- log(ifelse (radon.2$activity == 0, 0.1, radon.2$activity))
+
+# jags
+data_radon <- list(n = nrow(radon.2), y = y, x = radon.2$floor)
+
+inits_radon <- function(){
+  list(a = rnorm(1), 
+  b = rnorm(1), 
+  sigma.y = runif(1))}
+
+parameters_radon <- c("a", "b", "sigma.y")
+
+```
+
+* El ejercicio consiste en que definas número de cadenas, número de iteraciones
+y etapa de calentamiento en la siguiente instrucción. Asegurate de alcanzar
+convergencia y describe los diagnósticos que utilizaste para concluir que se 
+convergió a la distribución posterior.
+
+```{r, eval = FALSE}
+jags_radon <- jags(
+  data = data_radon, 
+  inits= inits_radon, 
+  parameters.to.save = parameters_radon, 
+  model.file = "modelo_regresion.bugs")
+```
+
+* El modelo anterior ignora la variación en los niveles de radón entre los 
+condados. Modifica el modelo para permitir variación, es decir, el modelo será 
+(modelo de unidades independientes):
+
+$$y_i \sim N(\alpha_{j[i]} + \beta x_i, \sigma_y^2)$$  
+
+* Grafica las estimaciones de $\alpha_{j}$ para los distintos condados.
+
+
+
