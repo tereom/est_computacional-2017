@@ -1,0 +1,47 @@
+---
+title: "Tarea Stan"
+output: html_document
+---
+
+Repetiremos el ajuste del modelo jerárquico con predictor a nivel condado, el 
+código necesario para hacerlo con `rstan` está en el
+siguiente link:
+
+https://github.com/stan-dev/example-models/tree/master/ARM/Ch.16
+
+En el repositorio está el código para replicar los 4 modelos que hicimos en tarea
+y clase.
+
+Por ejemplo, el modelo
+$$x_i \sim N(\alpha + \beta x_i, \sigma^2)$$
+está en el archivo `radon.pooling.stan`
+
+El modelo de unidades independientes 
+
+$$y_i \sim N(\alpha_{j[i]} + \beta x_i, \sigma_y^2) $$
+
+está en el archivo `radon.nopooling.stan`
+
+Y el modelo jerárquico con predictor a nivel condado (uranio) está en el archivo
+
+`radon.2.stan`
+
+Lo que debes hacer es: 
+
+* Instalar Stan. 
+
+* Usar `rstan` para estimar los coeficientes del modelo jerárquico con predictor (último modelo).
+
+* Revisar el código de radon.2a.stan y radon.2b.stan para hacer las predicciones
+de:
+    + El valor de radón para una nueva 
+casa sin sótano (floor = 1) en el condado 26.
+
+    + El valor de radón para una nueva 
+casa sin sótano (floor = 1) en un condado nuevo con nivel de uranio $2$.
+
+
+
+
+
+
