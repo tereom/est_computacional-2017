@@ -23,7 +23,7 @@ theme_set(theme_minimal())
 ```
 
 
-$X_1,...,X_n \sim p(x; \theta)$. Queremos estimar $\theta=(\theta_1,...,\theta_k)$
+$X_1,...,X_n \sim p(x| \theta)$. Queremos estimar $\theta=(\theta_1,...,\theta_k)$
 . Un estimador 
 $$\hat{\theta} = w(X_1,...,X_n)$$
 es una función de los datos.

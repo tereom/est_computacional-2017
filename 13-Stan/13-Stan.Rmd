@@ -9,12 +9,18 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Stan es un programa para generar muestras de una distribución posterior de los parámetros de un modelo, el nombre del programa hace referencia a [Stanislaw Ulam (1904-1984)](https://en.wikipedia.org/wiki/Stanislaw_Ulam) que fue pionero en los métodos de Monte Carlo. A diferencia de JAGS y BUGS, los pasos de la cadena de Markov se generan con un método llamado *Monte Carlo Hamiltoniano* (HMC). HMC puede ser más eficiente que otros muestreadores en JAGS y BUGS, en particular cuando se ajustan modelo grandes y complejos. 
+Stan es un programa para generar muestras de una distribución posterior de los parámetros de un modelo, el nombre del programa hace referencia a [Stanislaw Ulam (1904-1984)](https://en.wikipedia.org/wiki/Stanislaw_Ulam) que fue pionero en los métodos de Monte Carlo. A diferencia de JAGS y BUGS, los pasos de la cadena de Markov se generan con un método llamado *Monte Carlo Hamiltoniano* (HMC). HMC puede ser más eficiente que otros muestreadores en JAGS y BUGS, en particular cuando se ajustan modelo grandes y complejos (por ejemplo, con variables con
+correlación alta).
 
 ### Muestreo HMC
 
-Stan genera muestras de la posterior usando una variación del algoritmo de Metropolis. Recordemos como funciona el algoritmo de Metrópolis que vimos en clase:
+El uso de HMC en estadística es reciente, sin embargo, gracias a Stan se ha 
+expandido rápidamente tanto en academia como industria. Desafortunadamente, la
+teoría de HMC está desarrollada en términos de geometría diferencial, lo que hace que 
+su construcción formal requiera de matemáticas avanzadas. En estas notas 
+se presentan las ideas detrás de HMC siguiendo el libro [Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/) de Kruschke.
 
+Stan genera muestras de la posterior usando una variación del algoritmo de Metropolis. Recordemos como funciona el algoritmo de Metrópolis que vimos en clase:
 
 1. Tenemos una distribución objetivo $p(\theta)$ de la cual buscamos generar
 muestras. Debemos ser capaces de calcular el valor de $p(\theta)$ para cualquier
@@ -83,14 +89,22 @@ knitr::include_graphics("imagenes/hmc_proposals_3.png")
 
 Por último, para calcular la trayectoria propuesta debemos ser capaces de calcular el gradiente de la densidad posterior en cualquier valor de los parámetros. Para realizar esto de manera eficiente en espacios de dimensión alta se debe derivar analíticamente, en el caso de modelos complejos las fórmulas se derivan usando algoritmos avanzados.
 
+El paper [A Conceptual Introduction to Hamiltonian Monte Carlo](https://arxiv.org/pdf/1701.02434.pdf) de Michael Betancourt explica 
+conceptos e intuición detrás de HMC, y el porqué es apropiado en problemas de
+alta dimensión. 
+
 ### Ejemplo
 
 Para instalar Stan sigue las instrucciones de aquí. 
 
 Nosotros usaremos el paquete `rstan` y comenzamos con el ejemplo sencillo de estimar el sesgo de una moneda.
 
-```{r}
+```{r, message=FALSE}
 library(rstan)
+
+# opcional para correr en paralelo
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
 ```
 
 Al igual que en JAGS comenzamos especificando el modelo en el lenguaje de Stan. Lo podemos guardar en un archivo de texto o simplemente asignarlo a una variable en R.
@@ -108,6 +122,7 @@ model {
     theta ~ beta(1,1) ;
     y ~ bernoulli(theta) ;
 }
+
 '
 
 cat(file = "modelo.stan", modelo.stan)
@@ -135,24 +150,25 @@ En el paso de compilación Stan está calculando los gradientes para las dinámi
 Cramos los datos.
 
 ```{r}
-N = 50 ; z = 10 ; y = c(rep(1,z),rep(0,N-z))
+N = 50 ; z = 10 ; y = c(rep(1, z), rep(0, N - z))
 
-dataList <-  list( y = y , N = N )
-stanFit <-  sampling( object= stan_cpp, data=dataList ,
-                    chains=3 , iter=1000 , warmup=200 , thin=1 )
+data_list <- list(y = y, N = N )
+stan_fit <- sampling(object= stan_cpp, data = data_list,
+                    chains = 3 , iter = 1000 , warmup = 200, thin = 1 )
 ```
 
 
 ```{r}
-summary(stanFit)
+summary(stan_fit)
 ```
 
+Otro camino es compilar y correr las cadenas de manera simultanea con la función
+`stan()`.
 
-```{r}
-rstan_options(auto_write = TRUE)
-options(mc.cores = parallel::detectCores())
+```{r, warning=FALSE, message=FALSE, results='hide'}
+stan_fit_2 <- stan(file = 'modelo.stan', data = data_list, 
+    iter = 1000, chains = 4)
 ```
-
 
 ### Iniciales
 
@@ -166,3 +182,23 @@ ser conveniente usar conjugadas, aquí no).
 
 * Cuando se usen distribuciones iniciales informativas se debe ser explícito en porque se tomaron las decisiones.
 
+
+### Recursos adicionales
+
+* El paquete [rstanarm](https://cran.r-project.org/web/packages/rstanarm/vignettes/rstanarm.html) facilita el uso de Stan desde R, cuenta con funciones para 
+llevar a cabo estimación Bayesiana sin necesidad de escribir código en el 
+*lenguaje de Stan*, de acuerdo a los autores buscan que la estimación bayesiana 
+sea rutina para los modelos de regresión más comunes.
+
+* El paquete [bayesplot](bayesplot) cuenta con funciones para graficar estimaciones
+de los parámetros, realizar diagnósticos visuales de las cadenas (convergencia), 
+y analizar el ajuste del modelo (graficando de la predictiva posterior).
+
+* El paquete [shinystan](http://mc-stan.org/users/interfaces/shinystan) contiene
+resumenes gráficos y numéricos de parámetros de un modelo y de diagnósticos de
+convergencia.
+### Referencias
+
+* [Doing Bayesian Data Analysis](https://sites.google.com/site/doingbayesiandataanalysis/), John K. Kruschke.
+
+* [A Conceptual Introduction to Hamiltonian Monte Carlo](https://arxiv.org/pdf/1701.02434.pdf), Michael Betancourt.
