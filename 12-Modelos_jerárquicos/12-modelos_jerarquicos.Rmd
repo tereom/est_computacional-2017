@@ -309,7 +309,7 @@ post_marginales <- ggplot(grid_theta_m, aes(x = theta, y = post_theta)) +
 grid.arrange(post_conj, post_mu, post_theta, post_marginales, ncol=2)
 ```
 
-#### Multiples monedas de una misma fábrica
+### Multiples monedas de una misma fábrica
 
 La sección anterior considera el escenario en que lanzamos una moneda y hacemos
 inferencia del parámetro de sesgo $\theta$ y del hiperparámetro $\mu$. Ahora
@@ -483,7 +483,7 @@ grid.arrange(post_conj_1, post_conj_2, post_mu, post_theta_1, post_theta_2,
 
 ```
 
-### Muestreador de Gibbs
+### JAGS
 
 La sección anterior utilizó un modelo simplificado con el objetivo de poder
 visualizar el espacio de parámetros. Ahora incluiremos más parámetros con el 
@@ -661,7 +661,8 @@ $$
 		\lambda &\sim& g(\lambda).
 	\end{eqnarray} 
 $$
-El modelo gráfico correspondiente a este enfoque es:
+El modelo gráfico correspondiente a este enfoque (omitiendo la distribución de
+$\lambda$) es:
 
 <center><img src="imagenes/dag_pool.png" width="400px"/></center>
   
@@ -1120,94 +1121,6 @@ parámetro de interés $\lambda_j$ de los demás estudios sin considerarlos
 idénticos, de manera que se estima un parámetro $\lambda_j$ diferente para cada
 hospital.
 
-#### Intercambiabilidad
-En los modelos jerárquicos que estudiaremos suponemos intercambiabilidad; este
-concepto representa un escenario donde no se cuenta con información a priori que
-nos permita distinguir las $\lambda_{j}$ unas de otras (además de los datos 
-$y$).
-
-Un vector de parámetros $\lambda = (\lambda_{1},..., \lambda_{n})$ es 
-intercambiable si la distribución de $\lambda$ no cambia al permutar los 
-componentes del parámetro.
-
-Ahora, para construir un modelo jerárquico intercambiable, comenzamos 
-especificando la distribución de los datos, $y=(y_1,...,y_n)$:
-
-$$
-\begin{eqnarray}
-\nonumber
-y\sim f(y|\lambda),
-\end{eqnarray}
-$$
-
-condicional a $\lambda=(\lambda_{1},..., \lambda_{n})$, las observaciones 
-$\{y_1,...,y_n\}$ son independientes entre si con densidades 
-$f(y_{j}|\lambda_{j})$ independiente de $\lambda_{i}$, para $i\neq j$,
-
-$$
-\begin{eqnarray}
-\nonumber
-	f(y|\lambda) = \prod_{i=1}^n f(y_{i}|\lambda_{i}).
-\end{eqnarray}
-$$
-
-Buscamos que la distribución de $\lambda$ refleje intercambiabilidad, para ello
-suponemos que sus componentes son una muestra aleatoria de una distribución $g$:
-
-$$
-\begin{eqnarray}
-	\nonumber
-	g(\lambda_{1},..., \lambda_{k}|\theta) = \prod_{i=1}^n g(\lambda_{i}|\theta),
-\end{eqnarray}
-$$
-
-bajo éste supuesto las $\lambda_{j}$ son condicionalmente independientes dado el
-valor de un hiperparámetro $\theta$ al que se le asigna una inicial conocida,
-
-$$
-\theta \sim h(\theta)
-$$
-
-### Análisis posterior
-Ya que hemos asignado las distribuciones iniciales, la idea es hacer inferencias
-sobre los parámetros individuales $\lambda=(\lambda_1,...,\lambda_n)$ y el
-parámetro común $\theta$, utilizando las distribuciones posteriores. Entonces, 
-
-$$
-\begin{eqnarray}
-	\nonumber
-	f(\lambda,\theta|y)=g(\lambda|\theta,y)h(\theta|y)
-\end{eqnarray}
-$$
-
-donde
-
-$$
-\begin{eqnarray}
-	\nonumber
-	g(\lambda|\theta,y)\propto f(y|\lambda)g(\lambda|\theta)
-\end{eqnarray}
-$$
-y
-$$
-\begin{eqnarray}
-	\nonumber
-	h(\theta|y)\propto f(y|\theta)h(\theta),
-\end{eqnarray}
-$$
-con
-$$
-\begin{eqnarray}
-	\nonumber
-	f(y|\theta)=\int{f(y|\lambda)g(\lambda|\theta)d\theta}.
-\end{eqnarray}
-$$
-
-Con el cálculo de las distribuciones posteriores el modelo está completo, pues 
-la inferencia se basa en resúmenes de la distribución posterior de los 
-parámetros (media, mediana, varianza, intervalos, etc.).
-
-### Observaciones
 Enumeramos algunas de las ventajas potenciales de usar un modelo jerárquico.
 
 1. Modelo unificado. El problema de elegir entre un modelo de unidades iguales o 
@@ -1415,7 +1328,7 @@ Simulemos de las distribuciones posteriores, para ello procederemos como sigue:
 
 1. Simulamos $(\mu, \alpha)$ de la distribución marginal posterior.
 
-2. Simulamos $\lambda_1,...,\lambda_94$ de la distribución posterior condicional
+2. Simulamos $\lambda_1,...,\lambda_{94}$ de la distribución posterior condicional
 a los valores simulados $(\mu, \alpha)$.
 
 Para el primer paso, notamos que ambos parámetros son positivos por lo que es
