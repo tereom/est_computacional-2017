@@ -70,3 +70,6 @@ An Introduction to the Bootstrap, Bradley Efron, Robert J. Tibshirani, Chapman &
 ### Calificación
 
 Tareas 20% (se envían por correo con título: EstComp-TareaXX), exámen parcial (proyecto y exámen en clase) 40%, Exámen final 40%.
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Licencia Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />Este trabajo está bajo una <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Licencia Creative Commons Atribución 4.0 Internacional</a>.
