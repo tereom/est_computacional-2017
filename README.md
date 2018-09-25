@@ -1,6 +1,8 @@
 Estadística computacional
 ================
 
+**Notas actualizadas en:** https://tereom.github.io/est-computacional-2018/
+
 **Teresa Ortiz:** <teresa.ortiz.mancera@gmail.com>
 
 **Sitio del curso:** <http://www.teresa-ortiz.com/est-computacional>
