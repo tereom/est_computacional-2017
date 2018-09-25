@@ -3,6 +3,8 @@ title: "Estadística computacional"
 output: github_document
 ---
 
+**Notas actualizadas en:** https://tereom.github.io/est-computacional-2018/
+
 **Teresa Ortiz:** teresa.ortiz.mancera@gmail.com
 
 **Sitio del curso:** [http://www.teresa-ortiz.com/est-computacional](http://www.teresa-ortiz.com/est-computacional)
@@ -69,6 +71,5 @@ An Introduction to the Bootstrap,  Bradley Efron, Robert J. Tibshirani, Chapman 
 Tareas 20\% (se envían por correo con título: EstComp-TareaXX), exámen parcial 
 (proyecto y exámen en clase) 40\%, Exámen final 40\%.
 
-
-
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Licencia Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />Este trabajo está bajo una <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Licencia Creative Commons Atribución 4.0 Internacional</a>.
 
