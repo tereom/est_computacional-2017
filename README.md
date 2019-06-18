@@ -5,7 +5,7 @@ Estadística computacional
 
 **Teresa Ortiz:** <teresa.ortiz.mancera@gmail.com>
 
-**Sitio del curso:** <http://www.teresa-ortiz.com/est-computacional>
+**Sitio del curso 2018:** <https://tereom.github.io/est-computacional-2018/>
 
 **Github:** [/tereom/est\_computacional](https://github.com/tereom/est_computacional)
 
