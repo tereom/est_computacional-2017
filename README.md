@@ -1,11 +1,11 @@
 Estadística computacional
 ================
 
-**Notas actualizadas en:** https://tereom.github.io/est-computacional-2018/
+**Notas actualizadas en:** github.com/tereom/est-computacional-2019/
 
 **Teresa Ortiz:** <teresa.ortiz.mancera@gmail.com>
 
-**Sitio del curso 2018:** <https://tereom.github.io/est-computacional-2018/>
+**Sitio del curso 2018:** <https://tereom.github.io/est-computacional-2019/>
 
 **Github:** [/tereom/est\_computacional](https://github.com/tereom/est_computacional)
 
