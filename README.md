@@ -1,7 +1,7 @@
 Estadística computacional
 ================
 
-**Notas actualizadas en:** github.com/tereom/est-computacional-2019/
+**Notas actualizadas en:** <https://github.com/tereom/est-computacional-2019/>
 
 **Teresa Ortiz:** <teresa.ortiz.mancera@gmail.com>
 
