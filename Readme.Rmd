@@ -3,7 +3,7 @@ title: "Estadística computacional"
 output: github_document
 ---
 
-**Notas actualizadas en:** https://tereom.github.io/est-computacional-2018/
+**Notas actualizadas en:** https://tereom.github.io/est-computacional-2019/
 
 **Teresa Ortiz:** teresa.ortiz.mancera@gmail.com
 
